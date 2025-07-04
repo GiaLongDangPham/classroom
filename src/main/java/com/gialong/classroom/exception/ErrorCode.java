@@ -15,6 +15,7 @@ public enum ErrorCode {
     CLASS_NOT_FOUND(400, "Class not found", HttpStatus.BAD_REQUEST),
     ALREADY_ENROLLED_CLASS(400, "Already Enrolled Class", HttpStatus.BAD_REQUEST),
     NOT_ENROLLED_CLASS(400, "Not Enrolled Class", HttpStatus.BAD_REQUEST),
+    POST_NOT_FOUND(404, "Post not found", HttpStatus.NOT_FOUND),
     ;
 
     private final int code;
