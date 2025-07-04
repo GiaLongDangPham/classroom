@@ -10,8 +10,8 @@ spring:
 
   jpa:
     hibernate:
-#      ddl-auto: update
-      ddl-auto: none
+      ddl-auto: update
+#      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
@@ -34,5 +34,6 @@ logging:
     org.hibernate.type.descriptor.sql: TRACE
 
 jwt:
-  secret: my-secret-key-123456
+  secret: TtiaN4N1rUT9XQHDQDnGh1uzYTwbNslQUx855YUFn7NZXdskUpg68KlBrGvhwicO
   expiration: 86400000 # 1 ngày
+  refresh-expiration: 604800000 # 7 ngày (7 * 24 * 60 * 60 * 1000)
