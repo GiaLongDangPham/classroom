@@ -1,17 +1,17 @@
 package com.gialong.classroom.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "posts")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -27,6 +27,10 @@ public class Post {
 
     private LocalDateTime createdAt;
 
+    private Long likeCount;
+
+    private Long commentCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classroom_id")
     @JsonBackReference
@@ -36,4 +40,13 @@ public class Post {
     @JoinColumn(name = "created_by")
     @JsonBackReference
     private User createdBy;
+
+    @OneToMany(mappedBy = "post")
+    @JsonManagedReference
+    private List<PostLike> likes;
+
+    @OneToMany(mappedBy = "post")
+    @JsonManagedReference
+    private List<PostComment> comments;
+
 }

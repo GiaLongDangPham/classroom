@@ -1,4 +1,4 @@
-package com.gialong.classroom.dto.post;
+package com.gialong.classroom.dto.post.postcomment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,18 +11,12 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostResponse {
+public class PostCommentResponse {
     private Long id;
-    private String title;
+    private Long postId;
+    private Long userId;
     private String content;
-    private String imageUrl;
-
-    private Long likeCount;
-    private Long commentCount;
-
-    private boolean liked;
-
     private LocalDateTime createdAt;
     private String createdBy;
-    private Long classroomId;
+
 }

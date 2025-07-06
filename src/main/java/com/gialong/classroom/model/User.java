@@ -61,6 +61,14 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<Submission> submissions;
 
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<PostLike> likes;
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<PostComment> comments;
+
     @OneToMany(mappedBy = "sender")
     @JsonManagedReference
     private List<ChatMessage> chatMessages;

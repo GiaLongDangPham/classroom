@@ -8,6 +8,7 @@ import com.gialong.classroom.model.Classroom;
 import com.gialong.classroom.model.Post;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.ClassroomRepository;
+import com.gialong.classroom.repository.PostLikeRepository;
 import com.gialong.classroom.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final ClassroomRepository classroomRepository;
     private final AuthService authService;
+    private final PostLikeRepository postLikeRepository;
 
     public PostResponse createPost(PostRequest request) {
         User currentUser = authService.getCurrentUser();
@@ -32,6 +34,8 @@ public class PostService {
                 .title(request.getTitle())
                 .content(request.getContent())
                 .imageUrl(request.getImageUrl())
+                .likeCount(0L)
+                .commentCount(0L)
                 .classroom(classroom)
                 .createdBy(currentUser)
                 .createdAt(LocalDateTime.now())
@@ -85,12 +89,19 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    private PostResponse toPostResponse(Post post) {
+    public PostResponse toPostResponse(Post post) {
+        // Thêm isLiked
+        User currentUser = authService.getCurrentUser();
+        boolean isLiked = postLikeRepository.existsByPostIdAndUserId(post.getId(), currentUser.getId());
+
         return PostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .imageUrl(post.getImageUrl())
+                .likeCount(post.getLikeCount())
+                .commentCount(post.getCommentCount())
+                .liked(isLiked)
                 .createdAt(post.getCreatedAt())
                 .createdBy(String.format("%s %s", post.getCreatedBy().getFirstName(), post.getCreatedBy().getLastName()))
                 .classroomId(post.getClassroom().getId())
