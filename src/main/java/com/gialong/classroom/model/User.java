@@ -1,20 +1,20 @@
 package com.gialong.classroom.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -34,25 +34,35 @@ public class User implements UserDetails {
 
     private String email;
 
+    private String avatarUrl;
+
+    private LocalDateTime createdAt;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @OneToMany(mappedBy = "createdBy")
+    @JsonManagedReference
     private List<Classroom> classrooms;
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<Enrollment> enrollments;
 
     @OneToMany(mappedBy = "createdBy")
+    @JsonManagedReference
     private List<Post> posts;
 
     @OneToMany(mappedBy = "createdBy")
+    @JsonManagedReference
     private List<Assignment> assignments;
 
     @OneToMany(mappedBy = "student")
+    @JsonManagedReference
     private List<Submission> submissions;
 
     @OneToMany(mappedBy = "sender")
+    @JsonManagedReference
     private List<ChatMessage> chatMessages;
 
     @Override
@@ -79,4 +89,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
+
 }

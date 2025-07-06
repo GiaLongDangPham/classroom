@@ -1,10 +1,8 @@
 package com.gialong.classroom.controller;
 
 import com.gialong.classroom.dto.ResponseData;
-import com.gialong.classroom.dto.auth.AuthRequest;
 import com.gialong.classroom.dto.classroom.ClassroomRequest;
 import com.gialong.classroom.dto.classroom.ClassroomResponse;
-import com.gialong.classroom.model.User;
 import com.gialong.classroom.service.ClassroomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -77,4 +75,15 @@ public class ClassroomController {
                 .message("leave successfully")
                 .build();
     }
+
+    @GetMapping("explore")
+    public ResponseData<?> getExploreClasses() {
+        List<ClassroomResponse> classes = classroomService.getExploreClasses();
+        return ResponseData.builder()
+                .code(HttpStatus.OK.value())
+                .message("get explore classes successfully")
+                .data(classes)
+                .build();
+    }
+
 }

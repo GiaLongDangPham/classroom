@@ -1,5 +1,7 @@
 package com.gialong.classroom.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,12 +29,15 @@ public class Assignment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classroom_id")
+    @JsonBackReference
     private Classroom classroom;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
+    @JsonBackReference
     private User createdBy;
 
     @OneToMany(mappedBy = "assignment")
+    @JsonManagedReference
     private List<Submission> submissions;
 }

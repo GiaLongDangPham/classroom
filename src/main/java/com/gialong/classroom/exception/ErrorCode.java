@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+    UNCATEGORY(9999, "UNCATEGORY", HttpStatus.INTERNAL_SERVER_ERROR),
     USER_EXISTED(400, "User existed", HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(400, "User not existed", HttpStatus.BAD_REQUEST),
     UNAUTHORIZED(401, "Unauthorized", HttpStatus.UNAUTHORIZED),
@@ -18,6 +19,10 @@ public enum ErrorCode {
     POST_NOT_FOUND(404, "Post not found", HttpStatus.NOT_FOUND),
     ASSIGNMENT_NOT_FOUND(404, "Assignment not found", HttpStatus.NOT_FOUND),
     SUBMISSION_NOT_FOUND(404, "Submission not found", HttpStatus.NOT_FOUND),
+    PASSWORD_NOT_MATCHED(404, "Password not matched", HttpStatus.NOT_FOUND),
+    FILE_IS_EMPTY(404, "File is empty", HttpStatus.NOT_FOUND),
+    FOLDER_NOT_FOUND(404, "Folder not found", HttpStatus.NOT_FOUND),
+
     ;
 
     private final int code;

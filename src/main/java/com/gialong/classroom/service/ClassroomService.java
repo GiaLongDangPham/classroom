@@ -184,6 +184,23 @@ public class ClassroomService {
         }
     }
 
+    public List<ClassroomResponse> getExploreClasses() {
+        User currentUser = authService.getCurrentUser();
+        List<Long> joinedClassIds = enrollmentRepository.findByUserId(currentUser.getId())
+                .stream().map(e -> e.getClassroom().getId()).toList();
+
+        List<Classroom> all = classroomRepository.findAll();
+        return all.stream()
+                .filter(c -> !joinedClassIds.contains(c.getId()))
+                .map(c -> new ClassroomResponse(
+                        c.getId(), c.getName(), c.getDescription(), c.getJoinCode(),
+                        String.format("%s %s", c.getCreatedBy().getFirstName(), c.getCreatedBy().getLastName()),
+                        null
+                ))
+                .toList();
+    }
+
+
     private List<MemberResponse> getAllMembersInClassroom(Long classroomId) {
         List<Enrollment> enrollments = enrollmentRepository.findByClassroomId(classroomId);
 
