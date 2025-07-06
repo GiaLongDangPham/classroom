@@ -15,7 +15,8 @@ public class PostResponse {
     private Long id;
     private String title;
     private String content;
-    private String createdBy;
+    private String imageUrl;
     private LocalDateTime createdAt;
+    private String createdBy;
     private Long classroomId;
 }

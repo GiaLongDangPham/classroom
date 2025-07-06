@@ -208,6 +208,7 @@ public class ClassroomService {
                 .id(enrollment.getUser().getId())
                 .fullName(String.format("%s %s", enrollment.getUser().getFirstName(), enrollment.getUser().getLastName()))
                 .email(enrollment.getUser().getEmail())
+                .avatarUrl(enrollment.getUser().getAvatarUrl())
                 .roleInClass(enrollment.getRoleInClass().name())
                 .build()).toList();
     }

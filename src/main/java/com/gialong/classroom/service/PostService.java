@@ -31,6 +31,7 @@ public class PostService {
         Post post = Post.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
+                .imageUrl(request.getImageUrl())
                 .classroom(classroom)
                 .createdBy(currentUser)
                 .createdAt(LocalDateTime.now())
@@ -89,8 +90,9 @@ public class PostService {
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
+                .imageUrl(post.getImageUrl())
                 .createdAt(post.getCreatedAt())
-                .createdBy(post.getCreatedBy().getUsername())
+                .createdBy(String.format("%s %s", post.getCreatedBy().getFirstName(), post.getCreatedBy().getLastName()))
                 .classroomId(post.getClassroom().getId())
                 .build();
     }

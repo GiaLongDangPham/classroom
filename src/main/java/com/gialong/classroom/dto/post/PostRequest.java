@@ -1,6 +1,7 @@
 package com.gialong.classroom.dto.post;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class PostRequest {
 
-    @NotBlank(message = "Classroom ID is required")
+    @NotNull(message = "Classroom ID is required")
     private Long classroomId;
 
     @NotBlank(message = "Title is required")
@@ -16,4 +17,6 @@ public class PostRequest {
 
     @NotBlank(message = "Content is required")
     private String content;
+
+    private String imageUrl;
 }

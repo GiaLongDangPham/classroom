@@ -34,3 +34,6 @@ build/
 
 ### application.yml ###
 src/main/resources/application.yml
+
+# Upload folder
+uploads

@@ -14,4 +14,5 @@ public class MemberResponse {
     private String fullName;
     private String email;
     private String roleInClass;
+    private String avatarUrl;
 }

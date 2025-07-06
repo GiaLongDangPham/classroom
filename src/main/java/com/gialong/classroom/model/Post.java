@@ -22,6 +22,9 @@ public class Post {
 
     private String title;
     private String content;
+
+    private String imageUrl;
+
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
