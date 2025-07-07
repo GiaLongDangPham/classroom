@@ -3,6 +3,7 @@ package com.gialong.classroom.controller;
 import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.dto.auth.AuthRequest;
 import com.gialong.classroom.dto.auth.AuthResponse;
+import com.gialong.classroom.dto.user.UserResponse;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.service.AuthService;
 import jakarta.validation.Valid;
@@ -40,10 +41,11 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseData<?> getProfile() {
         User currentUser = authService.getCurrentUser();
+        UserResponse userResponse = authService.toUserResponse(currentUser);
         return ResponseData.builder()
                 .code(HttpStatus.OK.value())
                 .message("User info fetched successfully")
-                .data(currentUser)
+                .data(userResponse)
                 .build();
     }
 }

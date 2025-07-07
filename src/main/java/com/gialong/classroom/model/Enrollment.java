@@ -20,12 +20,10 @@ public class Enrollment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonBackReference
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classroom_id")
-    @JsonBackReference
     private Classroom classroom;
 
     @Enumerated(EnumType.STRING)

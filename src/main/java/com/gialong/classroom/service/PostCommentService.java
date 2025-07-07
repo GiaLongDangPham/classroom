@@ -48,7 +48,8 @@ public class PostCommentService {
                 .id(postComment.getId())
                 .content(postComment.getContent())
                 .postId(postComment.getPost().getId())
-                .userId(postComment.getUser().getId())
+                .userId(user.getId())
+                .avatarUrl(user.getAvatarUrl())
                 .createdAt(postComment.getCreatedAt())
                 .createdBy(String.format("%s %s", user.getFirstName(), user.getLastName()))
                 .build();

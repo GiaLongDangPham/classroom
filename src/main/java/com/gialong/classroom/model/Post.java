@@ -33,20 +33,16 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classroom_id")
-    @JsonBackReference
     private Classroom classroom;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
-    @JsonBackReference
     private User createdBy;
 
     @OneToMany(mappedBy = "post")
-    @JsonManagedReference
     private List<PostLike> likes;
 
     @OneToMany(mappedBy = "post")
-    @JsonManagedReference
     private List<PostComment> comments;
 
 }

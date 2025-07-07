@@ -16,6 +16,7 @@ public class PostResponse {
     private String title;
     private String content;
     private String imageUrl;
+    private String avatarUrl; //Avatar của user đã tạo
 
     private Long likeCount;
     private Long commentCount;

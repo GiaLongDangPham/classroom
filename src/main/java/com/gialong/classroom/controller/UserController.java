@@ -30,7 +30,7 @@ public class UserController {
     private final String UPLOAD_DIR = "uploads/avatars/";
 
     private final UserService userService;
-    private final AuthService authService;
+
     private final UserRepository userRepository;
 
     @PutMapping("/update/{id}")
@@ -52,4 +52,10 @@ public class UserController {
     }
 
 
+    @PutMapping("/me/avatar")
+    public ResponseEntity<?> updateAvatar(@RequestBody Map<String, String> body) {
+        String avatarUrl = body.get("avatarUrl");
+        userService.updateAvatar(avatarUrl);
+        return ResponseEntity.ok().build();
+    }
 }

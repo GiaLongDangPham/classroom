@@ -2,6 +2,7 @@ package com.gialong.classroom.service;
 
 import com.gialong.classroom.dto.auth.AuthRequest;
 import com.gialong.classroom.dto.auth.AuthResponse;
+import com.gialong.classroom.dto.user.UserResponse;
 import com.gialong.classroom.exception.AppException;
 import com.gialong.classroom.exception.ErrorCode;
 import com.gialong.classroom.model.Role;
@@ -70,5 +71,18 @@ public class AuthService {
 
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    }
+
+    public UserResponse toUserResponse(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .avatarUrl(user.getAvatarUrl())
+                .createdAt(user.getCreatedAt())
+                .role(user.getRole())
+                .build();
     }
 }

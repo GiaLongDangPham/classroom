@@ -18,5 +18,6 @@ public class PostCommentResponse {
     private String content;
     private LocalDateTime createdAt;
     private String createdBy;
+    private String avatarUrl;
 
 }

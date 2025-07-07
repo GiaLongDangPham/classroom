@@ -99,6 +99,7 @@ public class PostService {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .imageUrl(post.getImageUrl())
+                .avatarUrl(post.getCreatedBy().getAvatarUrl())
                 .likeCount(post.getLikeCount())
                 .commentCount(post.getCommentCount())
                 .liked(isLiked)

@@ -18,13 +18,11 @@ public class PostLike {
     @Id
     @ManyToOne
     @JoinColumn(name = "post_id")
-    @JsonBackReference
     private Post post;
 
     @Id
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonBackReference
     private User user;
 
     @Column(name = "created_at")

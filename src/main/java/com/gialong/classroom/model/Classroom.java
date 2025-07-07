@@ -27,22 +27,17 @@ public class Classroom {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
-    @JsonBackReference
     private User createdBy;
 
     @OneToMany(mappedBy = "classroom")
-    @JsonManagedReference
     private List<Enrollment> enrollments;
 
     @OneToMany(mappedBy = "classroom")
-    @JsonManagedReference
     private List<Post> posts;
 
     @OneToMany(mappedBy = "classroom")
-    @JsonManagedReference
     private List<Assignment> assignments;
 
     @OneToMany(mappedBy = "classroom")
-    @JsonManagedReference
     private List<ChatMessage> chatMessages;
 }

@@ -42,35 +42,27 @@ public class User implements UserDetails {
     private Role role;
 
     @OneToMany(mappedBy = "createdBy")
-    @JsonManagedReference
     private List<Classroom> classrooms;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
     private List<Enrollment> enrollments;
 
     @OneToMany(mappedBy = "createdBy")
-    @JsonManagedReference
     private List<Post> posts;
 
     @OneToMany(mappedBy = "createdBy")
-    @JsonManagedReference
     private List<Assignment> assignments;
 
     @OneToMany(mappedBy = "student")
-    @JsonManagedReference
     private List<Submission> submissions;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
     private List<PostLike> likes;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
     private List<PostComment> comments;
 
     @OneToMany(mappedBy = "sender")
-    @JsonManagedReference
     private List<ChatMessage> chatMessages;
 
     @Override

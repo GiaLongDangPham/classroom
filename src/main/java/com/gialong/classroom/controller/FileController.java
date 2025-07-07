@@ -17,7 +17,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:4200") // Angular default port
 @RestController
 @RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
