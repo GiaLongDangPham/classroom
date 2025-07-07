@@ -2,16 +2,14 @@ package com.gialong.classroom.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "chat_messages")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -21,6 +19,7 @@ public class ChatMessage {
     private Long id;
 
     private String content;
+
     private LocalDateTime sentAt;
 
     @ManyToOne(fetch = FetchType.LAZY)

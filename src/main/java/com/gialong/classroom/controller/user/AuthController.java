@@ -1,4 +1,4 @@
-package com.gialong.classroom.controller;
+package com.gialong.classroom.controller.user;
 
 import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.dto.auth.AuthRequest;

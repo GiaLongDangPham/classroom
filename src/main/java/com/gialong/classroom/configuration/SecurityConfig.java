@@ -27,7 +27,8 @@ public class SecurityConfig{
 
     private static final String[] White_List = {
             "/api/v1/auth/**",
-            "/api/v1/files/**"
+            "/api/v1/files/**",
+            "/ws/**"
     };
 
     private final JwtAuthFilter jwtAuthFilter;
@@ -61,7 +62,7 @@ public class SecurityConfig{
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:4200")); // 👈 Angular domain
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("*"));
         config.setAllowedHeaders(List.of("*")); // 👈 tất cả headers
         config.setAllowCredentials(true);
 
