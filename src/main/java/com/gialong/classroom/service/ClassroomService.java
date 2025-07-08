@@ -5,18 +5,15 @@ import com.gialong.classroom.dto.classroom.ClassroomResponse;
 import com.gialong.classroom.dto.classroom.MemberResponse;
 import com.gialong.classroom.exception.AppException;
 import com.gialong.classroom.exception.ErrorCode;
-import com.gialong.classroom.model.Classroom;
-import com.gialong.classroom.model.Enrollment;
-import com.gialong.classroom.model.Role;
-import com.gialong.classroom.model.User;
+import com.gialong.classroom.model.*;
+import com.gialong.classroom.repository.ChatMessageRepository;
 import com.gialong.classroom.repository.ClassroomRepository;
 import com.gialong.classroom.repository.EnrollmentRepository;
-import com.gialong.classroom.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,7 +23,7 @@ public class ClassroomService {
     private final ClassroomRepository classroomRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final AuthService authService;
-    private final UserRepository userRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     public ClassroomResponse createClass(ClassroomRequest request) {
         // Lấy người dùng hiện tại từ SecurityContext
@@ -58,14 +55,7 @@ public class ClassroomService {
                 .build();
         enrollmentRepository.save(enrollment);
 
-        return new ClassroomResponse(
-                classroom.getId(),
-                classroom.getName(),
-                classroom.getDescription(),
-                classroom.getJoinCode(),
-                String.format("%s %s", currentUser.getFirstName(), currentUser.getLastName()),
-                getAllMembersInClassroom(classroom.getId())
-        );
+        return toClassroomResponse(classroom);
     }
 
     public ClassroomResponse joinClass(String joinCode) {
@@ -82,24 +72,15 @@ public class ClassroomService {
             throw new AppException(ErrorCode.ALREADY_ENROLLED_CLASS);
         }
 
-
         // Tạo bản ghi Enrollment với vai trò STUDENT
         Enrollment enrollment = Enrollment.builder()
                 .user(currentUser)
                 .classroom(classroom)
                 .roleInClass(Role.STUDENT)
                 .build();
-
         enrollmentRepository.save(enrollment);
 
-        return new ClassroomResponse(
-                classroom.getId(),
-                classroom.getName(),
-                classroom.getDescription(),
-                classroom.getJoinCode(),
-                String.format("%s %s", classroom.getCreatedBy().getFirstName(), classroom.getCreatedBy().getLastName()),
-                getAllMembersInClassroom(classroom.getId())
-        );
+        return toClassroomResponse(classroom);
     }
 
     public List<ClassroomResponse> getMyClasses() {
@@ -110,15 +91,7 @@ public class ClassroomService {
         return enrollments.stream()
                 .map(enrollment -> {
                     Classroom classroom = enrollment.getClassroom();
-
-                    return ClassroomResponse.builder()
-                            .id(classroom.getId())
-                            .name(classroom.getName())
-                            .description(classroom.getDescription())
-                            .joinCode(classroom.getJoinCode())
-                            .createdBy(String.format("%s %s", classroom.getCreatedBy().getFirstName(),
-                                                            classroom.getCreatedBy().getLastName()))
-                            .build();
+                    return toClassroomResponse(classroom);
                 })
                 .toList();
     }
@@ -126,20 +99,7 @@ public class ClassroomService {
     public ClassroomResponse getClassDetail(Long classId) {
         Classroom classroom = classroomRepository.findById(classId)
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
-
-        List<MemberResponse> members = getAllMembersInClassroom(classId);
-        String creatorName = String.format("%s %s",
-                classroom.getCreatedBy().getFirstName(),
-                classroom.getCreatedBy().getLastName());
-
-        return ClassroomResponse.builder()
-                .id(classroom.getId())
-                .name(classroom.getName())
-                .description(classroom.getDescription())
-                .joinCode(classroom.getJoinCode())
-                .createdBy(creatorName)
-                .members(members)
-                .build();
+        return toClassroomResponse(classroom);
     }
 
     public void deleteClass(Long classId) {
@@ -192,11 +152,7 @@ public class ClassroomService {
         List<Classroom> all = classroomRepository.findAll();
         return all.stream()
                 .filter(c -> !joinedClassIds.contains(c.getId()))
-                .map(c -> new ClassroomResponse(
-                        c.getId(), c.getName(), c.getDescription(), c.getJoinCode(),
-                        String.format("%s %s", c.getCreatedBy().getFirstName(), c.getCreatedBy().getLastName()),
-                        null
-                ))
+                .map(this::toClassroomResponse)
                 .toList();
     }
 
@@ -215,6 +171,22 @@ public class ClassroomService {
 
     private String generateJoinCode() {
         return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
+
+    private ClassroomResponse toClassroomResponse(Classroom classroom) {
+        Optional<ChatMessage> lastMessage = chatMessageRepository.findTopByClassroomIdOrderBySentAtDesc(classroom.getId());
+
+        return ClassroomResponse.builder()
+                .id(classroom.getId())
+                .name(classroom.getName())
+                .description(classroom.getDescription())
+                .joinCode(classroom.getJoinCode())
+                .createdBy(String.format("%s %s",
+                        classroom.getCreatedBy().getFirstName(),
+                        classroom.getCreatedBy().getLastName()))
+                .members(getAllMembersInClassroom(classroom.getId()))
+                .lastMessage(lastMessage.isPresent() ? lastMessage.get().getContent() : null)
+                .build();
     }
 
 }
