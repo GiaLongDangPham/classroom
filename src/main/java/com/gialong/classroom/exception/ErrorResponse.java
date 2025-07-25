@@ -19,4 +19,3 @@ public class ErrorResponse implements Serializable {
     private String error;
     private String path;
 }
-

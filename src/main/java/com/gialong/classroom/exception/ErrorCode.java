@@ -17,6 +17,7 @@ public enum ErrorCode {
     ALREADY_ENROLLED_CLASS(400, "Already Enrolled Class", HttpStatus.BAD_REQUEST),
     NOT_ENROLLED_CLASS(400, "Not Enrolled Class", HttpStatus.BAD_REQUEST),
     POST_NOT_FOUND(404, "Post not found", HttpStatus.NOT_FOUND),
+    COMMENT_NOT_FOUND(404, "Comment not found", HttpStatus.NOT_FOUND),
     ASSIGNMENT_NOT_FOUND(404, "Assignment not found", HttpStatus.NOT_FOUND),
     SUBMISSION_NOT_FOUND(404, "Submission not found", HttpStatus.NOT_FOUND),
     PASSWORD_NOT_MATCHED(404, "Password not matched", HttpStatus.NOT_FOUND),

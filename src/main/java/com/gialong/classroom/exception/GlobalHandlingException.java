@@ -38,13 +38,6 @@ public class GlobalHandlingException {
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ProblemDetail> handleIdentityException(AppException exception, HttpServletRequest request) {
-        //        ErrorResponse errorResponse = ErrorResponse.builder()
-        //                .timestamp(new Date())
-        //                .status(HttpStatus.BAD_REQUEST.value())
-        //                .error(exception.getMessage())
-        //                .path(request.getRequestURI())
-        //                .build();
-
         ProblemDetail problemDetail =  ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle("Application Exception");
         problemDetail.setType(URI.create(request.getRequestURI()));

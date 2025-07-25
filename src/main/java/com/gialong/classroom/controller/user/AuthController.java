@@ -3,12 +3,14 @@ package com.gialong.classroom.controller.user;
 import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.dto.auth.AuthRequest;
 import com.gialong.classroom.dto.auth.AuthResponse;
+import com.gialong.classroom.dto.auth.RefreshTokenRequest;
 import com.gialong.classroom.dto.user.UserResponse;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,6 +38,13 @@ public class AuthController {
                 .message("Login success")
                 .data(authResponse)
                 .build();
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequest token) {
+        String refreshToken = token.getRefreshToken();
+        AuthResponse authResponse = authService.refresh(refreshToken);
+        return ResponseEntity.status(HttpStatus.OK).body(authResponse);
     }
 
     @GetMapping("/me")

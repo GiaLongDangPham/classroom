@@ -17,12 +17,6 @@ public class PostResponse {
     private String content;
     private String imageUrl;
     private String avatarUrl; //Avatar của user đã tạo
-
-    private Long likeCount;
-    private Long commentCount;
-
-    private boolean liked;
-
     private LocalDateTime createdAt;
     private String createdBy;
     private Long classroomId;

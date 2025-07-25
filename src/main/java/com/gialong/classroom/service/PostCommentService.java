@@ -8,7 +8,6 @@ import com.gialong.classroom.model.PostComment;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.PostCommentRepository;
 import com.gialong.classroom.repository.PostRepository;
-import com.gialong.classroom.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,7 @@ public class PostCommentService {
     private final AuthService authService;
 
     public List<PostCommentResponse> getComments(Long postId) {
-        return postCommentRepository.findByPostIdOrderByCreatedAtAsc(postId)
+        return postCommentRepository.findByPostIdOrderByCreatedAtDesc(postId)
                 .stream()
                 .map(this::toPostCommentResponse)
                 .toList();
@@ -40,6 +39,23 @@ public class PostCommentService {
         comment.setContent(content);
         comment.setCreatedAt(LocalDateTime.now());
         return toPostCommentResponse(postCommentRepository.save(comment));
+    }
+
+    public Long countComments(Long postId) {
+        return postCommentRepository.countByPostId(postId);
+    }
+
+    public void deleteComment(Long commentId) {
+        postCommentRepository.deleteById(commentId);
+    }
+
+    public PostCommentResponse updateComment(Long commentId, String content) {
+        PostComment postComment = postCommentRepository.findById(commentId)
+                .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND));
+
+        postComment.setContent(content);
+        postComment.setCreatedAt(LocalDateTime.now());
+        return toPostCommentResponse(postCommentRepository.save(postComment));
     }
 
     private PostCommentResponse toPostCommentResponse(PostComment postComment) {

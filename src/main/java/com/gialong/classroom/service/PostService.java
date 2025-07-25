@@ -34,7 +34,6 @@ public class PostService {
                 .title(request.getTitle())
                 .content(request.getContent())
                 .imageUrl(request.getImageUrl())
-                .likeCount(0L)
                 .commentCount(0L)
                 .classroom(classroom)
                 .createdBy(currentUser)
@@ -90,19 +89,12 @@ public class PostService {
     }
 
     public PostResponse toPostResponse(Post post) {
-        // Thêm isLiked
-        User currentUser = authService.getCurrentUser();
-        boolean isLiked = postLikeRepository.existsByPostIdAndUserId(post.getId(), currentUser.getId());
-
         return PostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .imageUrl(post.getImageUrl())
                 .avatarUrl(post.getCreatedBy().getAvatarUrl())
-                .likeCount(post.getLikeCount())
-                .commentCount(post.getCommentCount())
-                .liked(isLiked)
                 .createdAt(post.getCreatedAt())
                 .createdBy(String.format("%s %s", post.getCreatedBy().getFirstName(), post.getCreatedBy().getLastName()))
                 .classroomId(post.getClassroom().getId())

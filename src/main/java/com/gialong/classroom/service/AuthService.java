@@ -10,10 +10,12 @@ import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.UserRepository;
 import com.gialong.classroom.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
 
     public User register(AuthRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -63,6 +66,20 @@ public class AuthService {
         String refreshToken = jwtUtil.generateRefreshToken(user);
 
         return new AuthResponse(token, refreshToken);
+    }
+
+    public AuthResponse refresh(String refreshToken) {
+        String username = jwtUtil.extractUsername(refreshToken);
+        User user = (User) userDetailsService.loadUserByUsername(username); // Load lại từ DB nếu cần
+
+        if (!jwtUtil.validateToken(refreshToken, user)) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        String newAccessToken = jwtUtil.generateToken(user);
+        String newRefreshToken = jwtUtil.generateRefreshToken(user);
+
+        return new AuthResponse(newAccessToken, newRefreshToken);
     }
 
     public User getCurrentUser() {

@@ -1,6 +1,6 @@
 package com.gialong.classroom.service;
 
-import com.gialong.classroom.dto.post.PostResponse;
+import com.gialong.classroom.dto.post.postlike.PostLikeResponse;
 import com.gialong.classroom.exception.AppException;
 import com.gialong.classroom.exception.ErrorCode;
 import com.gialong.classroom.model.Post;
@@ -8,45 +8,58 @@ import com.gialong.classroom.model.PostLike;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.PostLikeRepository;
 import com.gialong.classroom.repository.PostRepository;
-import com.gialong.classroom.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
-    private final PostService postService;
     private final AuthService authService;
 
     @Transactional
-    public PostResponse likeOrUnlikePost(Long postId, String isLiked) {
+    public PostLikeResponse likeOrUnlikePost(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
         User user = authService.getCurrentUser();
 
-        if (Objects.equals(isLiked, "false")) {
-            postLikeRepository.deleteByPostIdAndUserId(postId, user.getId());
+        Optional<PostLike> postLike = postLikeRepository.findByPostIdAndUserId(postId, user.getId());
 
-            post.setLikeCount(post.getLikeCount() - 1);
+        PostLikeResponse postLikeResponse = new PostLikeResponse();
+
+        if(postLike.isPresent()) {
+            postLikeRepository.delete(postLike.get());
         }
         else {
-            PostLike like = new PostLike();
-            like.setPost(post);
-            like.setUser(user);
-            postLikeRepository.save(like);
-
-            post.setLikeCount(post.getLikeCount() + 1);
+            PostLike postLikeEntity = PostLike.builder()
+                    .post(post)
+                    .user(user)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            postLikeRepository.save(postLikeEntity);
+            postLikeResponse = toPostLikeResponse(postLikeEntity);
         }
-        postRepository.save(post);
-        return postService.toPostResponse(post);
+        return postLikeResponse;
     }
 
     public boolean isLiked(Long postId, Long userId) {
         return postLikeRepository.existsByPostIdAndUserId(postId, userId);
+    }
+
+    private PostLikeResponse toPostLikeResponse(PostLike postLike) {
+        return PostLikeResponse.builder()
+                .userId(postLike.getUser().getId())
+                .postId(postLike.getPost().getId())
+                .createdAt(postLike.getCreatedAt())
+                .build();
+    }
+
+    public Long countLikes(Long postId) {
+        return postLikeRepository.countByPostId(postId);
     }
 }

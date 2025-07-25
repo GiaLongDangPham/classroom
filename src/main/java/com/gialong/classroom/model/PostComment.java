@@ -25,6 +25,7 @@ public class PostComment {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "created_at")

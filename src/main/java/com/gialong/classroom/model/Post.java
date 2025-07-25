@@ -21,13 +21,13 @@ public class Post {
     private Long id;
 
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private String imageUrl;
 
     private LocalDateTime createdAt;
-
-    private Long likeCount;
 
     private Long commentCount;
 
