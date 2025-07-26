@@ -12,6 +12,7 @@ public enum ErrorCode {
     UNAUTHORIZED(401, "Unauthorized", HttpStatus.UNAUTHORIZED),
     ACCESS_DINED(403, "Access denied", HttpStatus.FORBIDDEN),
     TOKEN_INVALID(400, "Token invalid", HttpStatus.BAD_REQUEST),
+    REFRESH_TOKEN_INVALID(400, "Refresh token invalid", HttpStatus.BAD_REQUEST),
     ROLE_NOT_EXISTED(400, "Role not existed", HttpStatus.BAD_REQUEST),
     CLASS_NOT_FOUND(400, "Class not found", HttpStatus.BAD_REQUEST),
     ALREADY_ENROLLED_CLASS(400, "Already Enrolled Class", HttpStatus.BAD_REQUEST),

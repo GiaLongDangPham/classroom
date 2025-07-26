@@ -1,5 +1,6 @@
 package com.gialong.classroom.configuration;
 
+import com.gialong.classroom.exception.RestExceptionFilter;
 import com.gialong.classroom.util.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,7 @@ public class SecurityConfig{
     };
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final RestExceptionFilter restExceptionFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -45,6 +47,7 @@ public class SecurityConfig{
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(restExceptionFilter, jwtAuthFilter.getClass())
                 .build();
     }
 

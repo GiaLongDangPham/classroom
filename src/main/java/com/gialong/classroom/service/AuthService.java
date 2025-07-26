@@ -31,6 +31,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final TokenService tokenService;
 
     public User register(AuthRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -65,21 +66,15 @@ public class AuthService {
         String token = jwtUtil.generateToken(user);
         String refreshToken = jwtUtil.generateRefreshToken(user);
 
+        tokenService.addToken(user, token, refreshToken);
+
         return new AuthResponse(token, refreshToken);
     }
 
     public AuthResponse refresh(String refreshToken) {
         String username = jwtUtil.extractUsername(refreshToken);
         User user = (User) userDetailsService.loadUserByUsername(username); // Load lại từ DB nếu cần
-
-        if (!jwtUtil.validateToken(refreshToken, user)) {
-            throw new AppException(ErrorCode.UNAUTHORIZED);
-        }
-
-        String newAccessToken = jwtUtil.generateToken(user);
-        String newRefreshToken = jwtUtil.generateRefreshToken(user);
-
-        return new AuthResponse(newAccessToken, newRefreshToken);
+        return tokenService.refresh(user, refreshToken);
     }
 
     public User getCurrentUser() {
