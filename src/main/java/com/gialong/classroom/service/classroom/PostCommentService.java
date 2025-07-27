@@ -1,4 +1,4 @@
-package com.gialong.classroom.service;
+package com.gialong.classroom.service.classroom;
 
 import com.gialong.classroom.dto.post.postcomment.PostCommentResponse;
 import com.gialong.classroom.exception.AppException;
@@ -8,6 +8,7 @@ import com.gialong.classroom.model.PostComment;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.PostCommentRepository;
 import com.gialong.classroom.repository.PostRepository;
+import com.gialong.classroom.service.user.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

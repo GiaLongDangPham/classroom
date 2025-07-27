@@ -1,4 +1,4 @@
-package com.gialong.classroom.service;
+package com.gialong.classroom.service.user;
 
 import com.gialong.classroom.dto.user.ChangePasswordRequest;
 import com.gialong.classroom.dto.user.UpdateProfileRequest;

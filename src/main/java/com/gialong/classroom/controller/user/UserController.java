@@ -5,7 +5,7 @@ import com.gialong.classroom.dto.user.ChangePasswordRequest;
 import com.gialong.classroom.dto.user.UpdateProfileRequest;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.UserRepository;
-import com.gialong.classroom.service.UserService;
+import com.gialong.classroom.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.gialong.classroom.service;
+package com.gialong.classroom.service.classroom;
 
 
 import com.gialong.classroom.dto.assignment.AssignmentRequest;
@@ -10,6 +10,7 @@ import com.gialong.classroom.model.Classroom;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.AssignmentRepository;
 import com.gialong.classroom.repository.ClassroomRepository;
+import com.gialong.classroom.service.user.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package com.gialong.classroom.service;
+package com.gialong.classroom.service.user;
 
 import com.gialong.classroom.dto.auth.AuthRequest;
 import com.gialong.classroom.dto.auth.AuthResponse;
@@ -8,9 +8,9 @@ import com.gialong.classroom.exception.ErrorCode;
 import com.gialong.classroom.model.Role;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.UserRepository;
+import com.gialong.classroom.service.TokenService;
 import com.gialong.classroom.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

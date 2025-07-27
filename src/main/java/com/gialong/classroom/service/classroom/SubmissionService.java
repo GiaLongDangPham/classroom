@@ -1,4 +1,4 @@
-package com.gialong.classroom.service;
+package com.gialong.classroom.service.classroom;
 
 
 import com.gialong.classroom.dto.submission.SubmissionRequest;
@@ -10,11 +10,11 @@ import com.gialong.classroom.model.Submission;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.AssignmentRepository;
 import com.gialong.classroom.repository.SubmissionRepository;
+import com.gialong.classroom.service.user.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

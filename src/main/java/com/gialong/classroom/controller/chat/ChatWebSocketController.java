@@ -7,7 +7,7 @@ import com.gialong.classroom.model.Classroom;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.ChatMessageRepository;
 import com.gialong.classroom.repository.UserRepository;
-import com.gialong.classroom.service.AuthService;
+import com.gialong.classroom.service.user.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;

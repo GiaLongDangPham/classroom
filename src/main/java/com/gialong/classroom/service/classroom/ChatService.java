@@ -1,10 +1,10 @@
-package com.gialong.classroom.service;
+package com.gialong.classroom.service.classroom;
 
 
 import com.gialong.classroom.dto.chat.ChatMessageResponse;
 import com.gialong.classroom.model.ChatMessage;
-import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.ChatMessageRepository;
+import com.gialong.classroom.service.user.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

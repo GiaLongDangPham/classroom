@@ -1,4 +1,4 @@
-package com.gialong.classroom.service;
+package com.gialong.classroom.service.classroom;
 
 import com.gialong.classroom.dto.classroom.ClassroomRequest;
 import com.gialong.classroom.dto.classroom.ClassroomResponse;
@@ -9,6 +9,7 @@ import com.gialong.classroom.model.*;
 import com.gialong.classroom.repository.ChatMessageRepository;
 import com.gialong.classroom.repository.ClassroomRepository;
 import com.gialong.classroom.repository.EnrollmentRepository;
+import com.gialong.classroom.service.user.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -185,7 +186,8 @@ public class ClassroomService {
                         classroom.getCreatedBy().getFirstName(),
                         classroom.getCreatedBy().getLastName()))
                 .members(getAllMembersInClassroom(classroom.getId()))
-                .lastMessage(lastMessage.isPresent() ? lastMessage.get().getContent() : null)
+                .lastMessage(lastMessage.map(ChatMessage::getContent).orElse(null))
+                .lastMessageTimestamp(lastMessage.map(ChatMessage::getSentAt).orElse(null))
                 .build();
     }
 

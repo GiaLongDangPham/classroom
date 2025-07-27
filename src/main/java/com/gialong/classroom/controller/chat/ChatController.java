@@ -1,7 +1,7 @@
 package com.gialong.classroom.controller.chat;
 
 import com.gialong.classroom.dto.chat.ChatMessageResponse;
-import com.gialong.classroom.service.ChatService;
+import com.gialong.classroom.service.classroom.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

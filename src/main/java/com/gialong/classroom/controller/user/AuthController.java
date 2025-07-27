@@ -6,7 +6,7 @@ import com.gialong.classroom.dto.auth.AuthResponse;
 import com.gialong.classroom.dto.auth.RefreshTokenRequest;
 import com.gialong.classroom.dto.user.UserResponse;
 import com.gialong.classroom.model.User;
-import com.gialong.classroom.service.AuthService;
+import com.gialong.classroom.service.user.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

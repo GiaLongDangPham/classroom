@@ -1,4 +1,4 @@
-package com.gialong.classroom.service;
+package com.gialong.classroom.service.user;
 
 import com.gialong.classroom.exception.AppException;
 import com.gialong.classroom.exception.ErrorCode;

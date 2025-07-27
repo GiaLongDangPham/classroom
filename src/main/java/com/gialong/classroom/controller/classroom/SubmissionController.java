@@ -1,9 +1,9 @@
-package com.gialong.classroom.controller;
+package com.gialong.classroom.controller.classroom;
 
 import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.dto.submission.SubmissionRequest;
 import com.gialong.classroom.dto.submission.SubmissionResponse;
-import com.gialong.classroom.service.SubmissionService;
+import com.gialong.classroom.service.classroom.SubmissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

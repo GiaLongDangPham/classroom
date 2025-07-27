@@ -1,9 +1,9 @@
-package com.gialong.classroom.controller;
+package com.gialong.classroom.controller.classroom;
 
 import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.dto.classroom.ClassroomRequest;
 import com.gialong.classroom.dto.classroom.ClassroomResponse;
-import com.gialong.classroom.service.ClassroomService;
+import com.gialong.classroom.service.classroom.ClassroomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

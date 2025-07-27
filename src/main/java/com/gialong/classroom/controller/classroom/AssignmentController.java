@@ -1,10 +1,9 @@
-package com.gialong.classroom.controller;
+package com.gialong.classroom.controller.classroom;
 
 import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.dto.assignment.AssignmentRequest;
 import com.gialong.classroom.dto.assignment.AssignmentResponse;
-import com.gialong.classroom.model.User;
-import com.gialong.classroom.service.AssignmentService;
+import com.gialong.classroom.service.classroom.AssignmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
