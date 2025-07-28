@@ -1,5 +1,6 @@
 package com.gialong.classroom.service.classroom;
 
+import com.gialong.classroom.dto.PageResponse;
 import com.gialong.classroom.dto.classroom.ClassroomRequest;
 import com.gialong.classroom.dto.classroom.ClassroomResponse;
 import com.gialong.classroom.dto.classroom.MemberResponse;
@@ -7,10 +8,16 @@ import com.gialong.classroom.exception.AppException;
 import com.gialong.classroom.exception.ErrorCode;
 import com.gialong.classroom.model.*;
 import com.gialong.classroom.repository.ChatMessageRepository;
+import com.gialong.classroom.repository.ClassroomElasticRepository;
 import com.gialong.classroom.repository.ClassroomRepository;
 import com.gialong.classroom.repository.EnrollmentRepository;
 import com.gialong.classroom.service.user.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,17 +32,16 @@ public class ClassroomService {
     private final EnrollmentRepository enrollmentRepository;
     private final AuthService authService;
     private final ChatMessageRepository chatMessageRepository;
+    private final ClassroomElasticRepository classroomElasticRepository;
+    private final ElasticsearchTemplate elasticsearchTemplate;
 
     public ClassroomResponse createClass(ClassroomRequest request) {
-        // Lấy người dùng hiện tại từ SecurityContext
         User currentUser = authService.getCurrentUser();
 
-        // Chỉ cho phép TEACHER
         if (currentUser.getRole() != Role.TEACHER) {
             throw new AppException(ErrorCode.ACCESS_DINED);
         }
 
-        // Tạo mã lớp ngẫu nhiên
         String joinCode = generateJoinCode();
 
         // Tạo classroom
@@ -56,7 +62,58 @@ public class ClassroomService {
                 .build();
         enrollmentRepository.save(enrollment);
 
+        // Sau khi lưu MySQL -> lưu vào Elasticsearch
+        ClassroomElasticSearch elastic = ClassroomElasticSearch.builder()
+                .id(classroom.getId().toString())
+                .name(classroom.getName())
+                .description(classroom.getDescription())
+                .joinCode(classroom.getJoinCode())
+                .createdBy(classroom.getCreatedBy().getFirstName() + " " + classroom.getCreatedBy().getLastName())
+                .build();
+        classroomElasticRepository.save(elastic);
+
         return toClassroomResponse(classroom);
+    }
+
+    public PageResponse<ClassroomElasticSearch> searchElastic(int page, int size, String keyword) {
+        NativeQuery query;
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            query = NativeQuery.builder()
+                    .withQuery(q -> q.matchAll(m -> m))
+                    .withPageable(PageRequest.of(page - 1, size))
+                    .build();
+        } else {
+            query = NativeQuery.builder()
+                    .withQuery(q -> q.bool(b -> b
+                            .should(s -> s.match(m -> m.field("name")
+                                    .query(keyword)
+                                    .fuzziness("AUTO")
+                                    .minimumShouldMatch("70%")
+                                    .boost(2.0F)))
+                            .should(s -> s.match(m -> m.field("description")
+                                    .query(keyword)
+                                    .fuzziness("AUTO")
+                                    .minimumShouldMatch("70%")))
+                            .should(s -> s.matchPhrasePrefix(m -> m.field("joinCode")
+                                    .query(keyword)))
+                            .should(s -> s.match(m -> m.field("createdBy")
+                                    .query(keyword)))
+                    ))
+                    .withPageable(PageRequest.of(page - 1, size))
+                    .build();
+        }
+
+        SearchHits<ClassroomElasticSearch> hits = elasticsearchTemplate.search(query, ClassroomElasticSearch.class);
+        long total = hits.getTotalHits();
+
+        return PageResponse.<ClassroomElasticSearch>builder()
+                .currentPage(page)
+                .pageSize(size)
+                .totalElements(total)
+                .totalPages((int) Math.ceil((double) total / size))
+                .data(hits.getSearchHits().stream().map(SearchHit::getContent).toList())
+                .build();
     }
 
     public ClassroomResponse joinClass(String joinCode) {

@@ -1,8 +1,10 @@
 package com.gialong.classroom.controller.classroom;
 
+import com.gialong.classroom.dto.PageResponse;
 import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.dto.classroom.ClassroomRequest;
 import com.gialong.classroom.dto.classroom.ClassroomResponse;
+import com.gialong.classroom.model.ClassroomElasticSearch;
 import com.gialong.classroom.service.classroom.ClassroomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,20 @@ public class ClassroomController {
                 .code(HttpStatus.CREATED.value())
                 .message("create class successfully")
                 .data(classroomResponse)
+                .build();
+    }
+
+    @GetMapping("/search-classroom-with-elasticsearch")
+    public ResponseData<PageResponse<ClassroomElasticSearch>> searchElastic(
+            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "10") int size,
+            @RequestParam(name = "keyword", required = false) String keyword
+    ) {
+        var result = classroomService.searchElastic(page, size, keyword);
+        return ResponseData.<PageResponse<ClassroomElasticSearch>>builder()
+                .code(HttpStatus.OK.value())
+                .message("Get classrooms with elastic search")
+                .data(result)
                 .build();
     }
 

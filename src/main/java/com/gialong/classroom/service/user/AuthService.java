@@ -102,6 +102,15 @@ public class AuthService extends BaseRedisService {
             }
             String newAccessToken = jwtService.generateAccessToken(user);
             String newRefreshToken = jwtService.generateRefreshToken(user);
+
+            user.setRefreshToken(newRefreshToken);
+            userRepository.save(user);
+
+            String jwtId = SignedJWT.parse(refreshToken).getJWTClaimsSet().getJWTID();
+            long accessTokenExp = jwtService.extractTokenExpired(refreshToken);
+            this.set(jwtId, refreshToken);
+            this.setTimeToLive(jwtId, accessTokenExp, TimeUnit.MILLISECONDS);
+
             return AuthResponse.builder()
                     .token(newAccessToken)
                     .refreshToken(newRefreshToken)
