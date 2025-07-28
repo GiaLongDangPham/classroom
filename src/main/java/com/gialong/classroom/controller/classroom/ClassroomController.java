@@ -7,6 +7,7 @@ import com.gialong.classroom.service.classroom.ClassroomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class ClassroomController {
     private final ClassroomService classroomService;
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseData<?> createClass(@RequestBody @Valid ClassroomRequest request) {
         ClassroomResponse classroomResponse = classroomService.createClass(request);
         return ResponseData.builder()
@@ -39,6 +41,7 @@ public class ClassroomController {
     }
 
     @GetMapping("/my-classes")
+    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
     public ResponseData<?> getMyClasses() {
         List<ClassroomResponse> classroomResponses = classroomService.getMyClasses();
         return ResponseData.builder()
@@ -59,6 +62,7 @@ public class ClassroomController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseData<?> deleteClass(@PathVariable Long id) {
         classroomService.deleteClass(id);
         return ResponseData.builder()

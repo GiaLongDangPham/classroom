@@ -13,12 +13,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.UUID;
 
 @Service
@@ -46,7 +48,7 @@ public class JwtService extends BaseRedisService {
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now().plus(expiration, ChronoUnit.DAYS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
-                .claim("Authority", buildAuthority(user))
+                .claim("scope", buildScope(user))
                 .build();
 
         Payload payload = new Payload(claimsSet.toJSONObject());
@@ -111,8 +113,7 @@ public class JwtService extends BaseRedisService {
         log.info(String.valueOf(secretKey.getBytes().length));
         log.info("Token algorithm: {}", signedJWT.getHeader().getAlgorithm());
 
-        boolean ok = signedJWT.verify(new MACVerifier(secretKey.getBytes()));
-        return ok;
+        return signedJWT.verify(new MACVerifier(secretKey.getBytes()));
     }
 
     public long extractTokenExpired(String token) {
@@ -126,7 +127,7 @@ public class JwtService extends BaseRedisService {
         }
     }
 
-    private String buildAuthority(User user) {
-        return user.getRole().name();
+    private String buildScope(User user) {
+        return "ROLE_" + user.getRole().name();
     }
 }

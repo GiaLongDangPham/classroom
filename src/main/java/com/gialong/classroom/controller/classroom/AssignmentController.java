@@ -6,6 +6,7 @@ import com.gialong.classroom.dto.assignment.AssignmentResponse;
 import com.gialong.classroom.service.classroom.AssignmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class AssignmentController {
     private final AssignmentService assignmentService;
 
     @PostMapping
+    @PreAuthorize("hasRole('TEACHER')")
     public ResponseData<?> create(@RequestBody AssignmentRequest request) {
         AssignmentResponse response = assignmentService.createAssignment(request);
         return ResponseData.builder()
