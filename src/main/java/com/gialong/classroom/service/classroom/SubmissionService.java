@@ -46,19 +46,6 @@ public class SubmissionService {
                 .build();
     }
 
-//    public List<SubmissionResponse> getSubmissionsByAssignment(Long assignmentId) {
-//        return submissionRepository.findByAssignmentId(assignmentId)
-//                .stream()
-//                .map(s -> SubmissionResponse.builder()
-//                        .id(s.getId())
-//                        .studentName(s.getStudent().getFullName())
-//                        .fileUrl(s.getFileUrl())
-//                        .submittedAt(s.getSubmittedAt())
-//                        .score(s.getScore())
-//                        .build())
-//                .toList();
-//    }
-
     public void gradeSubmission(Long submissionId, int score) {
         Submission submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new AppException(ErrorCode.SUBMISSION_NOT_FOUND));

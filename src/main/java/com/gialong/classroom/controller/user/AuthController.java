@@ -3,6 +3,7 @@ package com.gialong.classroom.controller.user;
 import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.dto.auth.AuthRequest;
 import com.gialong.classroom.dto.auth.AuthResponse;
+import com.gialong.classroom.dto.auth.LogoutRequest;
 import com.gialong.classroom.dto.auth.RefreshTokenRequest;
 import com.gialong.classroom.dto.user.UserResponse;
 import com.gialong.classroom.model.User;
@@ -45,6 +46,15 @@ public class AuthController {
         String refreshToken = token.getRefreshToken();
         AuthResponse authResponse = authService.refresh(refreshToken);
         return ResponseEntity.status(HttpStatus.OK).body(authResponse);
+    }
+
+    @PostMapping("/logout")
+    ResponseData<Void> logout(@RequestBody @Valid LogoutRequest request) {
+        authService.signOut(request);
+        return ResponseData.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message("Sign out success")
+                .build();
     }
 
     @GetMapping("/me")

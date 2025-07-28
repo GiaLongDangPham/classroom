@@ -36,6 +36,9 @@ public class User implements UserDetails {
 
     private String avatarUrl;
 
+    @Column(name = "refresh_token", columnDefinition = "TEXT")
+    private String refreshToken;
+
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)

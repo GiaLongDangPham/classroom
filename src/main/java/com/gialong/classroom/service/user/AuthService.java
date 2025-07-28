@@ -2,36 +2,48 @@ package com.gialong.classroom.service.user;
 
 import com.gialong.classroom.dto.auth.AuthRequest;
 import com.gialong.classroom.dto.auth.AuthResponse;
+import com.gialong.classroom.dto.auth.LogoutRequest;
 import com.gialong.classroom.dto.user.UserResponse;
 import com.gialong.classroom.exception.AppException;
 import com.gialong.classroom.exception.ErrorCode;
 import com.gialong.classroom.model.Role;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.UserRepository;
-import com.gialong.classroom.service.TokenService;
-import com.gialong.classroom.util.JwtUtil;
-import lombok.RequiredArgsConstructor;
+import com.gialong.classroom.service.BaseRedisService;
+import com.gialong.classroom.service.JwtService;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jwt.SignedJWT;
+import io.micrometer.common.util.StringUtils;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Service
-@RequiredArgsConstructor
-public class AuthService {
+public class AuthService extends BaseRedisService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
-    private final TokenService tokenService;
+
+    public AuthService(RedisTemplate<String, Object> redisTemplate, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+        super(redisTemplate);
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+    }
 
     public User register(AuthRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -63,18 +75,58 @@ public class AuthService {
         );
         User user = (User) authentication.getPrincipal();
 
-        String token = jwtUtil.generateToken(user);
-        String refreshToken = jwtUtil.generateRefreshToken(user);
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
-        tokenService.addToken(user, token, refreshToken);
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
 
-        return new AuthResponse(token, refreshToken);
+        return new AuthResponse(accessToken, refreshToken);
     }
 
-    public AuthResponse refresh(String refreshToken) {
-        String username = jwtUtil.extractUsername(refreshToken);
-        User user = (User) userDetailsService.loadUserByUsername(username); // Load lại từ DB nếu cần
-        return tokenService.refresh(user, refreshToken);
+    public AuthResponse refresh(String refreshToken){
+        if (StringUtils.isBlank(refreshToken)) {
+            throw new AppException(ErrorCode.REFRESH_TOKEN_INVALID);
+        }
+        String username = jwtService.extractUsername(refreshToken);
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if(!Objects.equals(refreshToken, user.getRefreshToken()) || StringUtils.isBlank(user.getRefreshToken()))
+            throw new AppException(ErrorCode.REFRESH_TOKEN_INVALID);
+
+        try {
+            boolean isValidToken = jwtService.verificationToken(refreshToken, user);
+            if (!isValidToken) {
+                throw new AppException(ErrorCode.REFRESH_TOKEN_INVALID);
+            }
+            String newAccessToken = jwtService.generateAccessToken(user);
+            String newRefreshToken = jwtService.generateRefreshToken(user);
+            return AuthResponse.builder()
+                    .token(newAccessToken)
+                    .refreshToken(newRefreshToken)
+                    .build();
+        } catch (ParseException | JOSEException e) {
+            throw new AppException(ErrorCode.REFRESH_TOKEN_INVALID);
+        }
+    }
+
+    public void signOut(@Valid LogoutRequest request) {
+        String username = jwtService.extractUsername(request.getAccessToken());
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        long accessTokenExp = jwtService.extractTokenExpired(request.getAccessToken());
+        if(accessTokenExp > 0) {
+            try {
+                String jwtId = SignedJWT.parse(request.getAccessToken()).getJWTClaimsSet().getJWTID();
+                this.set(jwtId, request.getAccessToken());
+                this.setTimeToLive(jwtId, accessTokenExp, TimeUnit.MILLISECONDS);
+                user.setRefreshToken(null);
+                userRepository.save(user);
+            } catch (ParseException e) {
+                throw new AppException(ErrorCode.SIGN_OUT_FAILED);
+            }
+        }
     }
 
     public User getCurrentUser() {

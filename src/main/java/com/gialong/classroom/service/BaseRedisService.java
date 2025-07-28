@@ -25,8 +25,8 @@ public class BaseRedisService {
         redisTemplate.opsForValue().set(key, value);
     }
 
-    public void setTimeToLive(String key, long timeoutInDays) {
-        redisTemplate.expire(key, timeoutInDays, TimeUnit.DAYS);
+    public void setTimeToLive(String key, long duration, TimeUnit timeUnit) {
+        redisTemplate.expire(key, duration, timeUnit);
     }
 
     public void hashSet(String key, String field, Object value) {

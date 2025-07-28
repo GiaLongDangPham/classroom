@@ -12,6 +12,7 @@ public enum ErrorCode {
     UNAUTHORIZED(401, "Unauthorized", HttpStatus.UNAUTHORIZED),
     ACCESS_DINED(403, "Access denied", HttpStatus.FORBIDDEN),
     TOKEN_INVALID(400, "Token invalid", HttpStatus.BAD_REQUEST),
+    SIGN_OUT_FAILED(400, "Sign out failed", HttpStatus.BAD_REQUEST),
     REFRESH_TOKEN_INVALID(400, "Refresh token invalid", HttpStatus.BAD_REQUEST),
     ROLE_NOT_EXISTED(400, "Role not existed", HttpStatus.BAD_REQUEST),
     CLASS_NOT_FOUND(400, "Class not found", HttpStatus.BAD_REQUEST),
@@ -22,8 +23,6 @@ public enum ErrorCode {
     ASSIGNMENT_NOT_FOUND(404, "Assignment not found", HttpStatus.NOT_FOUND),
     SUBMISSION_NOT_FOUND(404, "Submission not found", HttpStatus.NOT_FOUND),
     PASSWORD_NOT_MATCHED(404, "Password not matched", HttpStatus.NOT_FOUND),
-    FILE_IS_EMPTY(404, "File is empty", HttpStatus.NOT_FOUND),
-    FOLDER_NOT_FOUND(404, "Folder not found", HttpStatus.NOT_FOUND),
 
     ;
 
