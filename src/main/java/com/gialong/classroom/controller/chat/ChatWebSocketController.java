@@ -6,11 +6,11 @@ import com.gialong.classroom.model.ChatMessage;
 import com.gialong.classroom.model.ChatMessageElasticSearch;
 import com.gialong.classroom.model.Classroom;
 import com.gialong.classroom.model.User;
-import com.gialong.classroom.repository.ChatMessageElasticRepository;
 import com.gialong.classroom.repository.ChatMessageRepository;
 import com.gialong.classroom.repository.UserRepository;
 import com.gialong.classroom.service.user.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -25,7 +25,7 @@ public class ChatWebSocketController {
     private final ChatMessageRepository chatMessageRepository;
     private final AuthService authService;
     private final UserRepository userRepository;
-    private final ChatMessageElasticRepository chatMessageElasticRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @MessageMapping("/chat.sendMessage/{classroomId}")
     public void sendMessage(@DestinationVariable Long classroomId, ChatMessageRequest message) {
@@ -43,7 +43,9 @@ public class ChatWebSocketController {
                 .classroomId(String.valueOf(saved.getClassroom().getId()))
                 .senderName(saved.getSender().getFirstName() + " " + saved.getSender().getLastName())
                 .build();
-        chatMessageElasticRepository.save(elasticMessage);
+//        chatMessageElasticRepository.save(elasticMessage);
+
+        kafkaTemplate.send("save-to-elastic-search", elasticMessage);
 
         messagingTemplate.convertAndSend(
                 "/topic/classroom/" + classroomId,
