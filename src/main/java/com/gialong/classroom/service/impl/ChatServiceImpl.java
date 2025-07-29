@@ -1,4 +1,4 @@
-package com.gialong.classroom.service.classroom;
+package com.gialong.classroom.service.impl;
 
 import com.gialong.classroom.dto.PageResponse;
 import com.gialong.classroom.dto.chat.ChatMessageResponse;
@@ -6,7 +6,7 @@ import com.gialong.classroom.model.ChatMessage;
 import com.gialong.classroom.model.ChatMessageElasticSearch;
 import com.gialong.classroom.repository.ChatMessageElasticRepository;
 import com.gialong.classroom.repository.ChatMessageRepository;
-import com.gialong.classroom.service.user.AuthService;
+import com.gialong.classroom.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
@@ -20,14 +20,15 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ChatService {
+public class ChatServiceImpl implements ChatService {
 
     private final ChatMessageRepository chatMessageRepository;
-    private final AuthService authService;
+    private final AuthServiceImpl authServiceImpl;
     private final ElasticsearchTemplate elasticsearchTemplate;
     private final ChatMessageElasticRepository chatMessageElasticRepository;
 
 
+    @Override
     public PageResponse<ChatMessageElasticSearch> searchMessages(
             int page, int size, String keywordContent, String keywordSender, String classroomId
     ) {
@@ -82,6 +83,7 @@ public class ChatService {
                 .build();
     }
 
+    @Override
     public List<ChatMessageResponse> getMessagesByClassroomId(Long classroomId) {
 
         return chatMessageRepository.findByClassroomIdOrderBySentAtAsc(classroomId)
@@ -95,7 +97,7 @@ public class ChatService {
                 .id(chatMessage.getId())
                 .classroomId(chatMessage.getClassroom().getId())
                 .content(chatMessage.getContent())
-                .user(authService.toUserResponse(chatMessage.getSender()))
+                .user(authServiceImpl.toUserResponse(chatMessage.getSender()))
                 .sentAt(chatMessage.getSentAt())
                 .build();
     }

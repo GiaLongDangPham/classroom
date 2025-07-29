@@ -1,5 +1,4 @@
-package com.gialong.classroom.service.classroom;
-
+package com.gialong.classroom.service.impl;
 
 import com.gialong.classroom.dto.assignment.AssignmentRequest;
 import com.gialong.classroom.dto.assignment.AssignmentResponse;
@@ -10,7 +9,7 @@ import com.gialong.classroom.model.Classroom;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.AssignmentRepository;
 import com.gialong.classroom.repository.ClassroomRepository;
-import com.gialong.classroom.service.user.AuthService;
+import com.gialong.classroom.service.AssignmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +17,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AssignmentService {
+public class AssignmentServiceImpl implements AssignmentService {
     private final AssignmentRepository assignmentRepository;
     private final ClassroomRepository classroomRepository;
-    private final AuthService authService;
+    private final AuthServiceImpl authServiceImpl;
 
+    @Override
     public AssignmentResponse createAssignment(AssignmentRequest request) {
-        User user = authService.getCurrentUser();
+        User user = authServiceImpl.getCurrentUser();
         Classroom classroom = classroomRepository.findById(request.getClassroomId())
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
 
@@ -49,6 +49,7 @@ public class AssignmentService {
                 .build();
     }
 
+    @Override
     public List<AssignmentResponse> getAssignmentsByClassroom(Long classroomId) {
         return assignmentRepository.findByClassroomId(classroomId)
                 .stream()

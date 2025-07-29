@@ -1,11 +1,11 @@
-package com.gialong.classroom.controller.classroom;
+package com.gialong.classroom.controller;
 
 import com.gialong.classroom.dto.PageResponse;
 import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.dto.classroom.ClassroomRequest;
 import com.gialong.classroom.dto.classroom.ClassroomResponse;
 import com.gialong.classroom.model.ClassroomElasticSearch;
-import com.gialong.classroom.service.classroom.ClassroomService;
+import com.gialong.classroom.service.ClassroomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

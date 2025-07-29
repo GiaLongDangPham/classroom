@@ -1,10 +1,10 @@
-package com.gialong.classroom.controller.chat;
+package com.gialong.classroom.controller;
 
 import com.gialong.classroom.dto.PageResponse;
 import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.dto.chat.ChatMessageResponse;
 import com.gialong.classroom.model.ChatMessageElasticSearch;
-import com.gialong.classroom.service.classroom.ChatService;
+import com.gialong.classroom.service.ChatService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,9 +1,9 @@
-package com.gialong.classroom.controller.classroom;
+package com.gialong.classroom.controller;
 
 import com.gialong.classroom.dto.post.postcomment.PostCommentResponse;
 import com.gialong.classroom.dto.post.postlike.PostLikeResponse;
-import com.gialong.classroom.service.classroom.PostCommentService;
-import com.gialong.classroom.service.classroom.PostLikeService;
+import com.gialong.classroom.service.PostCommentService;
+import com.gialong.classroom.service.PostLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

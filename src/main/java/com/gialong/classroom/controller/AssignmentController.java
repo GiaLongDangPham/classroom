@@ -1,9 +1,9 @@
-package com.gialong.classroom.controller.classroom;
+package com.gialong.classroom.controller;
 
 import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.dto.assignment.AssignmentRequest;
 import com.gialong.classroom.dto.assignment.AssignmentResponse;
-import com.gialong.classroom.service.classroom.AssignmentService;
+import com.gialong.classroom.service.AssignmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;

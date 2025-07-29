@@ -1,4 +1,4 @@
-package com.gialong.classroom.service.classroom;
+package com.gialong.classroom.service.impl;
 
 import com.gialong.classroom.dto.post.postlike.PostLikeResponse;
 import com.gialong.classroom.exception.AppException;
@@ -8,7 +8,7 @@ import com.gialong.classroom.model.PostLike;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.PostLikeRepository;
 import com.gialong.classroom.repository.PostRepository;
-import com.gialong.classroom.service.user.AuthService;
+import com.gialong.classroom.service.PostLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,16 +18,17 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class PostLikeService {
+public class PostLikeServiceImpl implements PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
-    private final AuthService authService;
+    private final AuthServiceImpl authServiceImpl;
 
     @Transactional
+    @Override
     public PostLikeResponse likeOrUnlikePost(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
-        User user = authService.getCurrentUser();
+        User user = authServiceImpl.getCurrentUser();
 
         Optional<PostLike> postLike = postLikeRepository.findByPostIdAndUserId(postId, user.getId());
 
@@ -48,6 +49,7 @@ public class PostLikeService {
         return postLikeResponse;
     }
 
+    @Override
     public boolean isLiked(Long postId, Long userId) {
         return postLikeRepository.existsByPostIdAndUserId(postId, userId);
     }
@@ -60,6 +62,7 @@ public class PostLikeService {
                 .build();
     }
 
+    @Override
     public Long countLikes(Long postId) {
         return postLikeRepository.countByPostId(postId);
     }

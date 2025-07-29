@@ -1,4 +1,4 @@
-package com.gialong.classroom.service.classroom;
+package com.gialong.classroom.service.impl;
 
 import com.gialong.classroom.dto.PageResponse;
 import com.gialong.classroom.dto.classroom.ClassroomRequest;
@@ -11,7 +11,7 @@ import com.gialong.classroom.repository.ChatMessageRepository;
 import com.gialong.classroom.repository.ClassroomElasticRepository;
 import com.gialong.classroom.repository.ClassroomRepository;
 import com.gialong.classroom.repository.EnrollmentRepository;
-import com.gialong.classroom.service.user.AuthService;
+import com.gialong.classroom.service.ClassroomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
@@ -26,17 +26,18 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ClassroomService {
+public class ClassroomServiceImpl implements ClassroomService {
 
     private final ClassroomRepository classroomRepository;
     private final EnrollmentRepository enrollmentRepository;
-    private final AuthService authService;
+    private final AuthServiceImpl authServiceImpl;
     private final ChatMessageRepository chatMessageRepository;
     private final ClassroomElasticRepository classroomElasticRepository;
     private final ElasticsearchTemplate elasticsearchTemplate;
 
+    @Override
     public ClassroomResponse createClass(ClassroomRequest request) {
-        User currentUser = authService.getCurrentUser();
+        User currentUser = authServiceImpl.getCurrentUser();
 
         if (currentUser.getRole() != Role.TEACHER) {
             throw new AppException(ErrorCode.ACCESS_DINED);
@@ -75,6 +76,7 @@ public class ClassroomService {
         return toClassroomResponse(classroom);
     }
 
+    @Override
     public PageResponse<ClassroomElasticSearch> searchElastic(int page, int size, String keyword) {
         NativeQuery query;
 
@@ -116,8 +118,9 @@ public class ClassroomService {
                 .build();
     }
 
+    @Override
     public ClassroomResponse joinClass(String joinCode) {
-        User currentUser = authService.getCurrentUser();
+        User currentUser = authServiceImpl.getCurrentUser();
 
         // Tìm lớp học theo mã
         Classroom classroom = classroomRepository.findByJoinCode(joinCode)
@@ -141,8 +144,9 @@ public class ClassroomService {
         return toClassroomResponse(classroom);
     }
 
+    @Override
     public List<ClassroomResponse> getMyClasses() {
-        User currentUser = authService.getCurrentUser();
+        User currentUser = authServiceImpl.getCurrentUser();
 
         List<Enrollment> enrollments = enrollmentRepository.findByUserId(currentUser.getId());
 
@@ -154,14 +158,16 @@ public class ClassroomService {
                 .toList();
     }
 
+    @Override
     public ClassroomResponse getClassDetail(Long classId) {
         Classroom classroom = classroomRepository.findById(classId)
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
         return toClassroomResponse(classroom);
     }
 
+    @Override
     public void deleteClass(Long classId) {
-        User currentUser = authService.getCurrentUser();
+        User currentUser = authServiceImpl.getCurrentUser();
 
         Classroom classroom = classroomRepository.findById(classId)
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
@@ -177,8 +183,9 @@ public class ClassroomService {
         classroomRepository.delete(classroom);
     }
 
+    @Override
     public void leaveClass(Long classId) {
-        User currentUser = authService.getCurrentUser();
+        User currentUser = authServiceImpl.getCurrentUser();
 
         Classroom classroom = classroomRepository.findById(classId)
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
@@ -202,8 +209,9 @@ public class ClassroomService {
         }
     }
 
+    @Override
     public List<ClassroomResponse> getExploreClasses() {
-        User currentUser = authService.getCurrentUser();
+        User currentUser = authServiceImpl.getCurrentUser();
         List<Long> joinedClassIds = enrollmentRepository.findByUserId(currentUser.getId())
                 .stream().map(e -> e.getClassroom().getId()).toList();
 
@@ -214,22 +222,6 @@ public class ClassroomService {
                 .toList();
     }
 
-
-    private List<MemberResponse> getAllMembersInClassroom(Long classroomId) {
-        List<Enrollment> enrollments = enrollmentRepository.findByClassroomId(classroomId);
-
-        return enrollments.stream().map(enrollment -> MemberResponse.builder()
-                .id(enrollment.getUser().getId())
-                .fullName(String.format("%s %s", enrollment.getUser().getFirstName(), enrollment.getUser().getLastName()))
-                .email(enrollment.getUser().getEmail())
-                .avatarUrl(enrollment.getUser().getAvatarUrl())
-                .roleInClass(enrollment.getRoleInClass().name())
-                .build()).toList();
-    }
-
-    private String generateJoinCode() {
-        return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-    }
 
     private ClassroomResponse toClassroomResponse(Classroom classroom) {
         Optional<ChatMessage> lastMessage = chatMessageRepository.findTopByClassroomIdOrderBySentAtDesc(classroom.getId());

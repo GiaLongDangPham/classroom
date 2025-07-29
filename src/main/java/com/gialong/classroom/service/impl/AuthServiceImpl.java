@@ -1,4 +1,4 @@
-package com.gialong.classroom.service.user;
+package com.gialong.classroom.service.impl;
 
 import com.gialong.classroom.dto.auth.AuthRequest;
 import com.gialong.classroom.dto.auth.AuthResponse;
@@ -9,12 +9,11 @@ import com.gialong.classroom.exception.ErrorCode;
 import com.gialong.classroom.model.Role;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.UserRepository;
-import com.gialong.classroom.service.BaseRedisService;
+import com.gialong.classroom.service.AuthService;
 import com.gialong.classroom.service.JwtService;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import io.micrometer.common.util.StringUtils;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,14 +29,16 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class AuthService extends BaseRedisService {
+public class AuthServiceImpl extends BaseRedisServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthService(RedisTemplate<String, Object> redisTemplate, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+    public AuthServiceImpl(RedisTemplate<String, Object> redisTemplate, UserRepository userRepository,
+                           PasswordEncoder passwordEncoder, JwtService jwtService,
+                           AuthenticationManager authenticationManager) {
         super(redisTemplate);
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -45,6 +46,7 @@ public class AuthService extends BaseRedisService {
         this.authenticationManager = authenticationManager;
     }
 
+    @Override
     public User register(AuthRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new AppException(ErrorCode.USER_EXISTED);
@@ -69,6 +71,7 @@ public class AuthService extends BaseRedisService {
 
     }
 
+    @Override
     public AuthResponse login(AuthRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
@@ -84,6 +87,7 @@ public class AuthService extends BaseRedisService {
         return new AuthResponse(accessToken, refreshToken);
     }
 
+    @Override
     public AuthResponse refresh(String refreshToken){
         if (StringUtils.isBlank(refreshToken)) {
             throw new AppException(ErrorCode.REFRESH_TOKEN_INVALID);
@@ -120,6 +124,7 @@ public class AuthService extends BaseRedisService {
         }
     }
 
+    @Override
     public void signOut(@Valid LogoutRequest request) {
         String username = jwtService.extractUsername(request.getAccessToken());
         User user = userRepository.findByUsername(username)

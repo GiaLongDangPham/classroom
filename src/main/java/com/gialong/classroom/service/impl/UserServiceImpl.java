@@ -1,4 +1,4 @@
-package com.gialong.classroom.service.user;
+package com.gialong.classroom.service.impl;
 
 import com.gialong.classroom.dto.user.ChangePasswordRequest;
 import com.gialong.classroom.dto.user.UpdateProfileRequest;
@@ -6,6 +6,7 @@ import com.gialong.classroom.exception.AppException;
 import com.gialong.classroom.exception.ErrorCode;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.UserRepository;
+import com.gialong.classroom.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,12 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final AuthService authService;
+    private final AuthServiceImpl authServiceImpl;
     private final PasswordEncoder passwordEncoder;
 
+    @Override
     public User updateProfile(Long userId, UpdateProfileRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -36,6 +38,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Override
     public void changePassword(Long id, ChangePasswordRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -49,8 +52,9 @@ public class UserService {
     }
 
     @Transactional
+    @Override
     public void updateAvatar(String avatarUrl) {
-        User user = authService.getCurrentUser(); // từ AuthService
+        User user = authServiceImpl.getCurrentUser(); // từ AuthService
         user.setAvatarUrl(avatarUrl);
         userRepository.save(user);
     }

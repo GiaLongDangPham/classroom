@@ -1,4 +1,4 @@
-package com.gialong.classroom.service.classroom;
+package com.gialong.classroom.service.impl;
 
 import com.gialong.classroom.dto.post.PostRequest;
 import com.gialong.classroom.dto.post.PostResponse;
@@ -8,9 +8,8 @@ import com.gialong.classroom.model.Classroom;
 import com.gialong.classroom.model.Post;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.ClassroomRepository;
-import com.gialong.classroom.repository.PostLikeRepository;
 import com.gialong.classroom.repository.PostRepository;
-import com.gialong.classroom.service.user.AuthService;
+import com.gialong.classroom.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +18,15 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PostService {
+public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final ClassroomRepository classroomRepository;
-    private final AuthService authService;
-    private final PostLikeRepository postLikeRepository;
+    private final AuthServiceImpl authServiceImpl;
 
+    @Override
     public PostResponse createPost(PostRequest request) {
-        User currentUser = authService.getCurrentUser();
+        User currentUser = authServiceImpl.getCurrentUser();
         Classroom classroom = classroomRepository.findById(request.getClassroomId())
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
 
@@ -45,6 +44,7 @@ public class PostService {
         return toPostResponse(post);
     }
 
+    @Override
     public List<PostResponse> getPostsByClassId(Long classId) {
         if (!classroomRepository.existsById(classId)) {
             throw new AppException(ErrorCode.CLASS_NOT_FOUND);
@@ -55,14 +55,16 @@ public class PostService {
                 .toList();
     }
 
+    @Override
     public PostResponse getPostById(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
         return toPostResponse(post);
     }
 
+    @Override
     public PostResponse updatePost(Long id, PostRequest request) {
-        User currentUser = authService.getCurrentUser();
+        User currentUser = authServiceImpl.getCurrentUser();
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
 
@@ -77,8 +79,9 @@ public class PostService {
         return toPostResponse(post);
     }
 
+    @Override
     public void deletePost(Long id) {
-        User currentUser = authService.getCurrentUser();
+        User currentUser = authServiceImpl.getCurrentUser();
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
 

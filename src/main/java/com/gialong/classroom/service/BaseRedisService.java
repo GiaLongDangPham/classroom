@@ -1,80 +1,32 @@
 package com.gialong.classroom.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-@Service
-public class BaseRedisService {
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final HashOperations<String, String, Object> hashOperations;
+public interface BaseRedisService {
+    void set(String key, Object value);
 
-    public BaseRedisService(RedisTemplate<String, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-        this.hashOperations = redisTemplate.opsForHash();
-    }
+    void setTimeToLive(String key, long duration, TimeUnit timeUnit);
 
-    public void set(String key, Object value) {
-        redisTemplate.opsForValue().set(key, value);
-    }
+    void hashSet(String key, String field, Object value);
 
-    public void setTimeToLive(String key, long duration, TimeUnit timeUnit) {
-        redisTemplate.expire(key, duration, timeUnit);
-    }
+    boolean hashExists(String key, String field);
 
-    public void hashSet(String key, String field, Object value) {
-        hashOperations.put(key, field, value);
-    }
+    Object get(String key);
 
-    public boolean hashExists(String key, String field) {
-        return hashOperations.hasKey(key, field);
-    }
+    Map<String, Object> getField(String key);
 
-    public Object get(String key){
-        return redisTemplate.opsForValue().get(key);
-    }
+    Object hashGet(String key, String field);
 
-    public Map<String, Object> getField(String key){
-        return hashOperations.entries(key);
-    }
+    List<Object> hashGetByFieldPrefix(String key, String fieldPrefix);
 
-    public Object hashGet(String key, String field){
-        return hashOperations.get(key, field);
-    }
+    Set<String> getFieldPrefixes(String key);
 
-    public List<Object> hashGetByFieldPrefix(String key, String fieldPrefix){
-        List<Object> objects = new ArrayList<>();
-        Map<String, Object> hashEntries = hashOperations.entries(key);
-        for (Map.Entry<String, Object> entry : hashEntries.entrySet()) {
-            if(entry.getKey().startsWith(fieldPrefix)){
-                objects.add(entry.getValue());
-            }
-        }
-        return objects;
-    }
+    void delete(String key);
 
-    public Set<String> getFieldPrefixes(String key){
-        return hashOperations.entries(key).keySet();
-    }
+    void delete(String key, String field);
 
-    public void delete(String key){
-        redisTemplate.delete(key);
-    }
-
-    public void delete(String key, String field){
-        hashOperations.delete(key, field);
-    }
-
-    public void delete(String key, List<String> fields){
-        for(String field : fields){
-            hashOperations.delete(key, field);
-        }
-    }
+    void delete(String key, List<String> fields);
 }

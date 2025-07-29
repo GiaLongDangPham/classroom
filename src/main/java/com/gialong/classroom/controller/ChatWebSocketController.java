@@ -1,4 +1,4 @@
-package com.gialong.classroom.controller.chat;
+package com.gialong.classroom.controller;
 
 import com.gialong.classroom.dto.chat.ChatMessageRequest;
 import com.gialong.classroom.dto.chat.ChatMessageResponse;
@@ -8,7 +8,7 @@ import com.gialong.classroom.model.Classroom;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.ChatMessageRepository;
 import com.gialong.classroom.repository.UserRepository;
-import com.gialong.classroom.service.user.AuthService;
+import com.gialong.classroom.service.impl.AuthServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 public class ChatWebSocketController {
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatMessageRepository chatMessageRepository;
-    private final AuthService authService;
+    private final AuthServiceImpl authServiceImpl;
     private final UserRepository userRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -53,7 +53,7 @@ public class ChatWebSocketController {
                         .id(saved.getId())
                         .classroomId(saved.getClassroom().getId())
                         .content(saved.getContent())
-                        .user(authService.toUserResponse(saved.getSender()))
+                        .user(authServiceImpl.toUserResponse(saved.getSender()))
                         .sentAt(saved.getSentAt())
                         .build()
         );
