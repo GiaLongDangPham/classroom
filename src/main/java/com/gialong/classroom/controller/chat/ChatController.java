@@ -1,17 +1,19 @@
 package com.gialong.classroom.controller.chat;
 
+import com.gialong.classroom.dto.PageResponse;
+import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.dto.chat.ChatMessageResponse;
+import com.gialong.classroom.model.ChatMessageElasticSearch;
 import com.gialong.classroom.service.classroom.ChatService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/chat")
 public class ChatController {
@@ -22,5 +24,22 @@ public class ChatController {
     public ResponseEntity<?> getChatMessages(@PathVariable Long classroomId) {
         List<ChatMessageResponse> messages = chatService.getMessagesByClassroomId(classroomId);
         return ResponseEntity.ok(messages);
+    }
+
+    @GetMapping("/search-message-with-elasticsearch")
+    public ResponseData<PageResponse<ChatMessageElasticSearch>> searchMessages(
+            HttpServletRequest request,
+            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "10") int size,
+            @RequestParam(name = "keywordContent", required = false) String keywordContent,
+            @RequestParam(name = "keywordSender", required = false) String keywordSender,
+            @RequestParam(name = "classroomId") String classroomId
+    ) {
+        var result = chatService.searchMessages(page, size, keywordContent, keywordSender, classroomId);
+        return ResponseData.<PageResponse<ChatMessageElasticSearch>>builder()
+                .code(HttpStatus.OK.value())
+                .message("Get classrooms with elastic search")
+                .data(result)
+                .build();
     }
 }

@@ -3,8 +3,10 @@ package com.gialong.classroom.controller.chat;
 import com.gialong.classroom.dto.chat.ChatMessageRequest;
 import com.gialong.classroom.dto.chat.ChatMessageResponse;
 import com.gialong.classroom.model.ChatMessage;
+import com.gialong.classroom.model.ChatMessageElasticSearch;
 import com.gialong.classroom.model.Classroom;
 import com.gialong.classroom.model.User;
+import com.gialong.classroom.repository.ChatMessageElasticRepository;
 import com.gialong.classroom.repository.ChatMessageRepository;
 import com.gialong.classroom.repository.UserRepository;
 import com.gialong.classroom.service.user.AuthService;
@@ -23,6 +25,7 @@ public class ChatWebSocketController {
     private final ChatMessageRepository chatMessageRepository;
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final ChatMessageElasticRepository chatMessageElasticRepository;
 
     @MessageMapping("/chat.sendMessage/{classroomId}")
     public void sendMessage(@DestinationVariable Long classroomId, ChatMessageRequest message) {
@@ -33,6 +36,14 @@ public class ChatWebSocketController {
                                                             .classroom(Classroom.builder().id(classroomId).build())
                                                             .sentAt(LocalDateTime.now())
                                                             .build());
+        // Sau khi lưu vào db, lưu vào elastic
+        ChatMessageElasticSearch elasticMessage = ChatMessageElasticSearch.builder()
+                .id(String.valueOf(saved.getId()))
+                .content(saved.getContent())
+                .classroomId(String.valueOf(saved.getClassroom().getId()))
+                .senderName(saved.getSender().getFirstName() + " " + saved.getSender().getLastName())
+                .build();
+        chatMessageElasticRepository.save(elasticMessage);
 
         messagingTemplate.convertAndSend(
                 "/topic/classroom/" + classroomId,
