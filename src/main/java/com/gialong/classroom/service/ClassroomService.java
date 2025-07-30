@@ -26,20 +26,4 @@ public interface ClassroomService {
     void leaveClass(Long classId);
 
     List<ClassroomResponse> getExploreClasses();
-
-    default List<MemberResponse> getAllMembersInClassroom(Long classroomId) {
-        List<Enrollment> enrollments = enrollmentRepository.findByClassroomId(classroomId);
-
-        return enrollments.stream().map(enrollment -> MemberResponse.builder()
-                .id(enrollment.getUser().getId())
-                .fullName(String.format("%s %s", enrollment.getUser().getFirstName(), enrollment.getUser().getLastName()))
-                .email(enrollment.getUser().getEmail())
-                .avatarUrl(enrollment.getUser().getAvatarUrl())
-                .roleInClass(enrollment.getRoleInClass().name())
-                .build()).toList();
-    }
-
-    default String generateJoinCode() {
-        return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-    }
 }

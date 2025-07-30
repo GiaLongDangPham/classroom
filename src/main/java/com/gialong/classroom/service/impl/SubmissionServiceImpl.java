@@ -1,6 +1,5 @@
 package com.gialong.classroom.service.impl;
 
-
 import com.gialong.classroom.dto.submission.SubmissionRequest;
 import com.gialong.classroom.dto.submission.SubmissionResponse;
 import com.gialong.classroom.exception.AppException;
@@ -10,6 +9,7 @@ import com.gialong.classroom.model.Submission;
 import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.AssignmentRepository;
 import com.gialong.classroom.repository.SubmissionRepository;
+import com.gialong.classroom.service.AuthService;
 import com.gialong.classroom.service.SubmissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,11 +21,11 @@ import java.time.LocalDateTime;
 public class SubmissionServiceImpl implements SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final AssignmentRepository assignmentRepository;
-    private final AuthServiceImpl authServiceImpl;
+    private final AuthService authService;
 
     @Override
     public SubmissionResponse submitAssignment(SubmissionRequest request) {
-        User student = authServiceImpl.getCurrentUser();
+        User student = authService.getCurrentUser();
         Assignment assignment = assignmentRepository.findById(request.getAssignmentId())
                 .orElseThrow(() -> new AppException(ErrorCode.ASSIGNMENT_NOT_FOUND));
 

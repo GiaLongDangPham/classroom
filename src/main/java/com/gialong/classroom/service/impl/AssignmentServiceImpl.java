@@ -10,6 +10,7 @@ import com.gialong.classroom.model.User;
 import com.gialong.classroom.repository.AssignmentRepository;
 import com.gialong.classroom.repository.ClassroomRepository;
 import com.gialong.classroom.service.AssignmentService;
+import com.gialong.classroom.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +21,11 @@ import java.util.List;
 public class AssignmentServiceImpl implements AssignmentService {
     private final AssignmentRepository assignmentRepository;
     private final ClassroomRepository classroomRepository;
-    private final AuthServiceImpl authServiceImpl;
+    private final AuthService authService;
 
     @Override
     public AssignmentResponse createAssignment(AssignmentRequest request) {
-        User user = authServiceImpl.getCurrentUser();
+        User user = authService.getCurrentUser();
         Classroom classroom = classroomRepository.findById(request.getClassroomId())
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
 

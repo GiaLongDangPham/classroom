@@ -40,34 +40,6 @@ Classroom Management System là một ứng dụng web full-stack được xây 
 - **UI**: TailwindCSS
 - **WebSocket**: SockJS + STOMP
 
-## 📦 Cấu trúc dự án
-
-```
-classroom/
-├── classroom/                    # Backend (Spring Boot)
-│   ├── src/main/java/com/gialong/classroom/
-│   │   ├── config/              # Cấu hình (Security, WebSocket, CORS)
-│   │   ├── controller/          # REST Controllers
-│   │   ├── dto/                 # Data Transfer Objects
-│   │   ├── exception/           # Exception Handling
-│   │   ├── model/               # JPA Entities
-│   │   ├── repository/          # JPA Repositories
-│   │   └── service/             # Business Logic
-│   └── src/main/resources/
-│       ├── application.yml      # Cấu hình ứng dụng
-│       └── static/              # Static files
-│
-└── classroom-fe/                # Frontend (Angular)
-    ├── src/app/
-    │   ├── guards/              # Route Guards
-    │   ├── interceptors/        # HTTP Interceptors
-    │   ├── models/              # TypeScript Models
-    │   ├── pages/               # Page Components
-    │   ├── services/            # Angular Services
-    │   └── layout/              # Layout Components
-    └── src/assets/              # Static Assets
-```
-
 
 
 ---

@@ -2,7 +2,6 @@ package com.gialong.classroom.controller;
 
 import com.gialong.classroom.dto.ResponseData;
 import com.gialong.classroom.service.FileService;
-import com.gialong.classroom.service.impl.FileServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;

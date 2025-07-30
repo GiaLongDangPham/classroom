@@ -36,14 +36,12 @@ public class ChatWebSocketController {
                                                             .classroom(Classroom.builder().id(classroomId).build())
                                                             .sentAt(LocalDateTime.now())
                                                             .build());
-        // Sau khi lưu vào db, lưu vào elastic
         ChatMessageElasticSearch elasticMessage = ChatMessageElasticSearch.builder()
                 .id(String.valueOf(saved.getId()))
                 .content(saved.getContent())
                 .classroomId(String.valueOf(saved.getClassroom().getId()))
                 .senderName(saved.getSender().getFirstName() + " " + saved.getSender().getLastName())
                 .build();
-//        chatMessageElasticRepository.save(elasticMessage);
 
         kafkaTemplate.send("save-to-elastic-search", elasticMessage);
 

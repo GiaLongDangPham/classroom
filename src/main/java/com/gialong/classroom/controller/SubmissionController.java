@@ -24,11 +24,6 @@ public class SubmissionController {
                 .build();
     }
 
-//    @GetMapping("/assignment/{assignmentId}")
-//    public ResponseData<?> getByAssignment(@PathVariable Long assignmentId) {
-//        return ResponseData.success(submissionService.getSubmissionsByAssignment(assignmentId));
-//    }
-
     @PutMapping("/{id}/grade")
     public ResponseData<?> grade(@PathVariable Long id, @RequestParam int score) {
         submissionService.gradeSubmission(id, score);

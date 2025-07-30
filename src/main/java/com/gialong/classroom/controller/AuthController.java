@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authServiceImpl;
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseData<?> register(@RequestBody @Valid AuthRequest request) {
-        User user = authServiceImpl.register(request);
+        User user = authService.register(request);
         return ResponseData.builder()
                 .code(HttpStatus.CREATED.value())
                 .message("Register success")
@@ -33,7 +33,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseData<?> login(@RequestBody @Valid AuthRequest request) {
-        AuthResponse authResponse = authServiceImpl.login(request);
+        AuthResponse authResponse = authService.login(request);
         return ResponseData.builder()
                 .code(HttpStatus.OK.value())
                 .message("Login success")
@@ -44,13 +44,13 @@ public class AuthController {
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
-        AuthResponse authResponse = authServiceImpl.refresh(refreshToken);
+        AuthResponse authResponse = authService.refresh(refreshToken);
         return ResponseEntity.status(HttpStatus.OK).body(authResponse);
     }
 
     @PostMapping("/logout")
     ResponseData<Void> logout(@RequestBody @Valid LogoutRequest request) {
-        authServiceImpl.signOut(request);
+        authService.signOut(request);
         return ResponseData.<Void>builder()
                 .code(HttpStatus.OK.value())
                 .message("Sign out success")
@@ -59,8 +59,8 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseData<?> getProfile() {
-        User currentUser = authServiceImpl.getCurrentUser();
-        UserResponse userResponse = authServiceImpl.toUserResponse(currentUser);
+        User currentUser = authService.getCurrentUser();
+        UserResponse userResponse = authService.toUserResponse(currentUser);
         return ResponseData.builder()
                 .code(HttpStatus.OK.value())
                 .message("User info fetched successfully")

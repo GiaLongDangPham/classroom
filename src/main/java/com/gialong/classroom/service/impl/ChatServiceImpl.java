@@ -27,7 +27,6 @@ public class ChatServiceImpl implements ChatService {
     private final ElasticsearchTemplate elasticsearchTemplate;
     private final ChatMessageElasticRepository chatMessageElasticRepository;
 
-
     @Override
     public PageResponse<ChatMessageElasticSearch> searchMessages(
             int page, int size, String keywordContent, String keywordSender, String classroomId
