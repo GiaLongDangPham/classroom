@@ -21,6 +21,13 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/outbound/authentication")
+    public ResponseData<AuthResponse> outboundAuthenticate(@RequestParam("code") String code){
+        var result = authService.outboundAuthenticate(code);
+        return ResponseData.<AuthResponse>builder()
+                .data(result).build();
+    }
+
     @PostMapping("/register")
     public ResponseData<?> register(@RequestBody @Valid AuthRequest request) {
         User user = authService.register(request);

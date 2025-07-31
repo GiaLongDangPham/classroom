@@ -91,7 +91,7 @@ public class ChatServiceImpl implements ChatService {
                 .toList();
     }
 
-    public ChatMessageResponse toChatMessageResponse(ChatMessage chatMessage) {
+    private ChatMessageResponse toChatMessageResponse(ChatMessage chatMessage) {
         return ChatMessageResponse.builder()
                 .id(chatMessage.getId())
                 .classroomId(chatMessage.getClassroom().getId())
@@ -102,7 +102,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Transactional
-    protected void migrateAllMessagesToElastic() {
+    public void migrateAllMessagesToElastic() {
         List<ChatMessage> allMessages = chatMessageRepository.findAll();
 
         List<ChatMessageElasticSearch> elasticMessages = allMessages.stream()

@@ -42,4 +42,9 @@ public class ChatController {
                 .data(result)
                 .build();
     }
+
+    @PostMapping("/migrate-all-messages-to-elastic")
+    public void migrateAllMessagesToElastic() {
+        chatService.migrateAllMessagesToElastic();
+    }
 }

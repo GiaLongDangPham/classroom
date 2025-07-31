@@ -12,4 +12,6 @@ public interface ChatService {
     );
 
     List<ChatMessageResponse> getMessagesByClassroomId(Long classroomId);
+
+    void migrateAllMessagesToElastic();
 }

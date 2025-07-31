@@ -113,9 +113,6 @@ public class JwtServiceImpl extends BaseRedisServiceImpl implements JwtService {
             log.error("Token expired");
             throw new AppException(ErrorCode.TOKEN_INVALID);
         }
-        log.info(String.valueOf(secretKey.getBytes().length));
-        log.info("Token algorithm: {}", signedJWT.getHeader().getAlgorithm());
-
         return signedJWT.verify(new MACVerifier(secretKey.getBytes()));
     }
 

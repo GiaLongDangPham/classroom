@@ -19,4 +19,6 @@ public interface AuthService {
     User getCurrentUser();
 
     UserResponse toUserResponse(User user);
+
+    AuthResponse outboundAuthenticate(String code);
 }

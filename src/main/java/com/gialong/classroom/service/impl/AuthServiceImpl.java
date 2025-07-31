@@ -1,13 +1,12 @@
 package com.gialong.classroom.service.impl;
 
-import com.gialong.classroom.dto.auth.AuthRequest;
-import com.gialong.classroom.dto.auth.AuthResponse;
-import com.gialong.classroom.dto.auth.LogoutRequest;
+import com.gialong.classroom.dto.auth.*;
 import com.gialong.classroom.dto.user.UserResponse;
 import com.gialong.classroom.exception.AppException;
 import com.gialong.classroom.exception.ErrorCode;
 import com.gialong.classroom.model.Role;
 import com.gialong.classroom.model.User;
+import com.gialong.classroom.repository.OutboundIdentityClient;
 import com.gialong.classroom.repository.UserRepository;
 import com.gialong.classroom.service.AuthService;
 import com.gialong.classroom.service.JwtService;
@@ -15,6 +14,8 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import io.micrometer.common.util.StringUtils;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,25 +26,56 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@Slf4j
 public class AuthServiceImpl extends BaseRedisServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final OutboundIdentityClient outboundIdentityClient;
+
+    @Value("${outbound.identity.client-id}")
+    private String CLIENT_ID;
+
+    @Value("${outbound.identity.client-secret}")
+    private String CLIENT_SECRET;
+
+    @Value("${outbound.identity.redirect-uri}")
+    private String REDIRECT_URI;
 
     public AuthServiceImpl(RedisTemplate<String, Object> redisTemplate, UserRepository userRepository,
                            PasswordEncoder passwordEncoder, JwtService jwtService,
-                           AuthenticationManager authenticationManager) {
+                           AuthenticationManager authenticationManager, OutboundIdentityClient outboundIdentityClient) {
         super(redisTemplate);
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.outboundIdentityClient = outboundIdentityClient;
+    }
+
+    @Override
+    public AuthResponse outboundAuthenticate(String code){
+        String GRANT_TYPE = "authorization_code";
+        Map<String, Object> requestMap = Map.of(
+                "code", code,
+                "client_id", CLIENT_ID,
+                "client_secret", CLIENT_SECRET,
+                "redirect_uri", REDIRECT_URI,
+                "grant_type", GRANT_TYPE
+        );
+        ExchangeTokenResponse response = outboundIdentityClient.exchangeToken(requestMap);
+        log.info("TOKEN RESPONSE {}", response);
+        return AuthResponse.builder()
+                .token(response.getAccessToken())
+                .refreshToken(response.getRefreshToken())
+                .build();
     }
 
     @Override
