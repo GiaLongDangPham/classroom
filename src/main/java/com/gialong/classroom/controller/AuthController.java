@@ -22,10 +22,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/outbound/authentication")
-    public ResponseData<AuthResponse> outboundAuthenticate(@RequestParam("code") String code){
-        var result = authService.outboundAuthenticate(code);
-        return ResponseData.<AuthResponse>builder()
-                .data(result).build();
+    public AuthResponse outboundAuthenticate(@RequestParam("code") String code){
+        return authService.outboundAuthenticate(code);
     }
 
     @PostMapping("/register")

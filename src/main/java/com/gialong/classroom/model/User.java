@@ -93,4 +93,8 @@ public class User implements UserDetails {
         return UserDetails.super.isEnabled();
     }
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

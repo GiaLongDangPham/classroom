@@ -1,13 +1,15 @@
 package com.gialong.classroom.service.impl;
 
 import com.gialong.classroom.dto.auth.*;
+import com.gialong.classroom.dto.user.OutboundUserResponse;
 import com.gialong.classroom.dto.user.UserResponse;
 import com.gialong.classroom.exception.AppException;
 import com.gialong.classroom.exception.ErrorCode;
 import com.gialong.classroom.model.Role;
 import com.gialong.classroom.model.User;
-import com.gialong.classroom.repository.OutboundIdentityClient;
+import com.gialong.classroom.repository.httpclient.OutboundIdentityClient;
 import com.gialong.classroom.repository.UserRepository;
+import com.gialong.classroom.repository.httpclient.OutboundUserClient;
 import com.gialong.classroom.service.AuthService;
 import com.gialong.classroom.service.JwtService;
 import com.nimbusds.jose.JOSEException;
@@ -26,8 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -39,6 +40,7 @@ public class AuthServiceImpl extends BaseRedisServiceImpl implements AuthService
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final OutboundIdentityClient outboundIdentityClient;
+    private final OutboundUserClient outboundUserClient;
 
     @Value("${outbound.identity.client-id}")
     private String CLIENT_ID;
@@ -51,30 +53,50 @@ public class AuthServiceImpl extends BaseRedisServiceImpl implements AuthService
 
     public AuthServiceImpl(RedisTemplate<String, Object> redisTemplate, UserRepository userRepository,
                            PasswordEncoder passwordEncoder, JwtService jwtService,
-                           AuthenticationManager authenticationManager, OutboundIdentityClient outboundIdentityClient) {
+                           AuthenticationManager authenticationManager, OutboundIdentityClient outboundIdentityClient,
+                           OutboundUserClient outboundUserClient) {
         super(redisTemplate);
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.outboundIdentityClient = outboundIdentityClient;
+        this.outboundUserClient = outboundUserClient;
     }
 
     @Override
     public AuthResponse outboundAuthenticate(String code){
         String GRANT_TYPE = "authorization_code";
-        Map<String, Object> requestMap = Map.of(
-                "code", code,
-                "client_id", CLIENT_ID,
-                "client_secret", CLIENT_SECRET,
-                "redirect_uri", REDIRECT_URI,
-                "grant_type", GRANT_TYPE
-        );
-        ExchangeTokenResponse response = outboundIdentityClient.exchangeToken(requestMap);
-        log.info("TOKEN RESPONSE {}", response);
+        var response = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
+                .code(code)
+                .clientId(CLIENT_ID)
+                .clientSecret(CLIENT_SECRET)
+                .redirectUri(REDIRECT_URI)
+                .grantType(GRANT_TYPE)
+                .build());
+        //onboard user (get user info)
+        OutboundUserResponse userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());
+
+        User user = userRepository.findByUsername(userInfo.getEmail())
+                .orElse(User.builder()
+                        .username(userInfo.getEmail())
+                        .firstName(userInfo.getGivenName())
+                        .lastName(userInfo.getFamilyName())
+                        .email(userInfo.getEmail())
+                        .avatarUrl(userInfo.getPicture())
+                        .role(Role.STUDENT)
+                        .build()
+                );
+
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+
         return AuthResponse.builder()
-                .token(response.getAccessToken())
-                .refreshToken(response.getRefreshToken())
+                .token(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
