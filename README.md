@@ -23,9 +23,6 @@ Classroom Management System là một ứng dụng web full-stack được xây 
 ### Tính năng chat thời gian thực  
 ![Real-time Chat Feature](docs/chat.png)
 
-### Trang hồ sơ người dùng
-![User Profile Page](docs/profile.png)
-
 ## Kiến trúc hệ thống
 
 ### Backend (Spring Boot)
