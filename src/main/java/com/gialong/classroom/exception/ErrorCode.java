@@ -23,7 +23,7 @@ public enum ErrorCode {
     ASSIGNMENT_NOT_FOUND(404, "Assignment not found", HttpStatus.NOT_FOUND),
     SUBMISSION_NOT_FOUND(404, "Submission not found", HttpStatus.NOT_FOUND),
     PASSWORD_NOT_MATCHED(404, "Password not matched", HttpStatus.NOT_FOUND),
-
+    CANNOT_SEND_EMAIL(400, "Cannot send email", HttpStatus.BAD_REQUEST),
     ;
 
     private final int code;

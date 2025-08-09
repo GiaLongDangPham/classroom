@@ -39,7 +39,7 @@ public class KafkaProducerConfiguration {
     }
 
     @Bean
-    public NewTopic confirmEmail() {
-        return new NewTopic("confirm-email", 3, (short) 1);
+    public NewTopic sendEmail() {
+        return new NewTopic("send-email", 3, (short) 1);
     }
 }

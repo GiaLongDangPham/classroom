@@ -1,7 +1,11 @@
 package com.gialong.classroom.service.impl;
 
+import com.gialong.classroom.dto.email.NotificationEvent;
+import com.gialong.classroom.dto.email.Recipient;
+import com.gialong.classroom.dto.email.SendEmailRequest;
 import com.gialong.classroom.model.ChatMessageElasticSearch;
 import com.gialong.classroom.repository.ChatMessageElasticRepository;
+import com.gialong.classroom.service.EmailService;
 import com.gialong.classroom.service.KafkaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class KafkaServiceImpl implements KafkaService {
 
     private final ChatMessageElasticRepository chatMessageElasticRepository;
+    private final EmailService emailService;
 
     @KafkaListener(topics = "save-to-elastic-search", groupId = "message-elastic-search")
     @Override
@@ -31,7 +36,19 @@ public class KafkaServiceImpl implements KafkaService {
             }
         }catch (Exception e) {
             log.error("Error while saving message to Elasticsearch: {}", e.getMessage());
-            throw e; // ném ngoại lệ để kafka tự retry
+            throw e;
         }
+    }
+
+    @KafkaListener(topics = "send-email", groupId = "notification-group")
+    @Override
+    public void sendEmail(NotificationEvent message) {
+        emailService.sendEmail(SendEmailRequest.builder()
+                .to(Recipient.builder()
+                        .email(message.getRecipient())
+                        .build())
+                .subject(message.getSubject())
+                .htmlContent(message.getBody())
+                .build());
     }
 }

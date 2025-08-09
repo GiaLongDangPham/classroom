@@ -1,6 +1,7 @@
 package com.gialong.classroom.service.impl;
 
 import com.gialong.classroom.dto.auth.*;
+import com.gialong.classroom.dto.email.NotificationEvent;
 import com.gialong.classroom.dto.user.OutboundUserResponse;
 import com.gialong.classroom.dto.user.UserResponse;
 import com.gialong.classroom.exception.AppException;
@@ -19,6 +20,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -41,6 +43,7 @@ public class AuthServiceImpl extends BaseRedisServiceImpl implements AuthService
     private final AuthenticationManager authenticationManager;
     private final OutboundIdentityClient outboundIdentityClient;
     private final OutboundUserClient outboundUserClient;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Value("${outbound.identity.client-id}")
     private String CLIENT_ID;
@@ -54,7 +57,7 @@ public class AuthServiceImpl extends BaseRedisServiceImpl implements AuthService
     public AuthServiceImpl(RedisTemplate<String, Object> redisTemplate, UserRepository userRepository,
                            PasswordEncoder passwordEncoder, JwtService jwtService,
                            AuthenticationManager authenticationManager, OutboundIdentityClient outboundIdentityClient,
-                           OutboundUserClient outboundUserClient) {
+                           OutboundUserClient outboundUserClient, KafkaTemplate<String, Object> kafkaTemplate) {
         super(redisTemplate);
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -62,6 +65,7 @@ public class AuthServiceImpl extends BaseRedisServiceImpl implements AuthService
         this.authenticationManager = authenticationManager;
         this.outboundIdentityClient = outboundIdentityClient;
         this.outboundUserClient = outboundUserClient;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     @Override
@@ -120,6 +124,16 @@ public class AuthServiceImpl extends BaseRedisServiceImpl implements AuthService
                 .createdAt(LocalDateTime.now())
                 .role(role)
                 .build();
+
+        NotificationEvent notificationEvent = NotificationEvent.builder()
+                .channel("EMAIL")
+                .recipient(request.getEmail())
+                .subject("Welcome to our classroom")
+                .body("Hello, have a good day with our classroom. Love you, " + request.getUsername())
+                .build();
+
+        // Publish message to kafka
+        kafkaTemplate.send("send-email", notificationEvent);
 
         return userRepository.save(user);
 
