@@ -26,16 +26,27 @@ Classroom Management System là một ứng dụng web full-stack được xây 
 ## Kiến trúc hệ thống
 
 ### Backend (Spring Boot)
-- **Framework**: Spring Boot 3.3.1
-- **Database**: MySQL, Redis
-- **Security**: Spring Security + JWT
-- **WebSocket**: STOMP Protocol
-- **API**: RESTful API
 
-### Frontend (Angular)
-- **Framework**: Angular 17
-- **UI**: TailwindCSS
-- **WebSocket**: SockJS + STOMP
+## 🛠️ Tech Stack
+
+### Backend
+- **Spring Boot 3.3.1**
+- **Spring Security & JWT**
+- **MySQL**
+- **Redis**
+- **WebSocket (STOMP Protocol)**
+- **Kafka**
+- **Elasticsearch**
+- **Logstash**
+- **Kibana**
+- **Swagger**
+
+### Frontend
+- **Angular 17**
+- **TailwindCSS**
+- **SockJS + STOMP**
+- **TypeScript**
+- **HTML5, SCSS**
 
 
 
