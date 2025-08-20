@@ -32,5 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 
+### Database ###
+./initdb.sql
+.env
+
 # Upload folder
 uploads

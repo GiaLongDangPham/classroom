@@ -1,8 +1,9 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/classroom_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: root
-    password: root
+#    docker run --name identity-service --network devteria-network -p 8080:8080 -e DBMS_CONNECTION=jdbc:mysql://mysql:3306/identity_service identity-service:0.9.0
+    url: jdbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT:3306}/classroom_db
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -51,3 +52,13 @@ openapi:
     title: API Service
     version: 1.0.0
 
+management:
+  endpoint:
+    health:
+      show-details: always   # luôn hiển thị chi tiết
+      show-components: always # hiển thị cả từng component con
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+#        include: health,info,metrics,prometheus

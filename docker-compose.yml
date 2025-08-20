@@ -2,6 +2,51 @@
 # SPDX-License-Identifier: APACHE-2.0
 
 services:
+
+#  classroom-service:
+#    container_name: classroom-service
+#    build:
+#      context: ./
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      DATABASE_HOST: mysql
+#      DATABASE_PORT: 3306
+#      DATABASE_USERNAME: root
+#      DATABASE_PASSWORD: root
+#      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+#      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+#      BREVO_API_KEY: ${BREVO_API_KEY}
+#      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+#      LOGSTASH_HOST: host.docker.internal:5600
+#    networks:
+#      - default
+#    depends_on:
+#      mysql:
+#        condition: service_healthy
+
+  mysql:
+    image: mysql:8.0.42
+    container_name: mysql
+    cap_add:
+      - SYS_NICE
+    environment:
+      - MYSQL_DATABASE=classroom_db
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
+    networks:
+      - default
+#    healthcheck:
+#      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+
   kafka:
     image: 'bitnami/kafka:3.7.0'
     container_name: kafka
@@ -32,7 +77,6 @@ services:
   kibana:
     image: kibana:7.14.1
     container_name: kibana
-    restart: always
     ports:
       - "5601:5601"
     environment:
@@ -43,7 +87,6 @@ services:
   logstash:
     image: logstash:7.14.1
     container_name: logstash
-    restart: always
     ports:
       - "5600:5600" # Socket port
       - "5044:5044"
@@ -63,8 +106,35 @@ services:
       - '6379:6379'
     volumes:
       - cache:/data
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=grafana
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    ports:
+      - "3000:3000"
+    links:
+      - prometheus
+    volumes:
+      - grafana:/var/lib/grafana
+
 volumes:
   cache:
     driver: local
   kafka-data:
     driver: local
+  mysql_data:
+  grafana:
