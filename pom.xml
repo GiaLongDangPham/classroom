@@ -28,6 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<image.path>docker.io/gialong1416</image.path>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -147,6 +148,30 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<spring.profiles.active>dev</spring.profiles.active>
+			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+			<properties>
+				<spring.profiles.active>test</spring.profiles.active>
+			</properties>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<spring.profiles.active>prod</spring.profiles.active>
+			</properties>
+		</profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -172,6 +197,33 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>2.8.0</version>
+				<configuration>
+					<from>
+						<image>openjdk:17-alpine</image>
+					</from>
+					<to>
+						<image>${image.path}/${project.artifactId}:20250821</image>
+						<auth>
+							<!--suppress UnresolvedMavenProperty -->
+							<username>${env.DOCKER_USERNAME}</username>
+							<!--suppress UnresolvedMavenProperty -->
+							<password>${env.DOCKER_PASSWORD}</password>
+						</auth>
+					</to>
+					<container>
+						<ports>
+							<port>8080</port>
+						</ports>
+						<environment>
+							<SPRING_PROFILES_ACTIVE>dev</SPRING_PROFILES_ACTIVE>
+						</environment>
+					</container>
 				</configuration>
 			</plugin>
 		</plugins>
